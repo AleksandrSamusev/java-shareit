@@ -15,5 +15,4 @@ public class Booking {
     private Item item;
     private Long booker;
     private BookingStatus status;
-
 }
