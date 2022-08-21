@@ -26,22 +26,13 @@ public class ItemController {
     @PostMapping
     public ItemDto createItem(@RequestHeader("X-Sharer-User-Id") Long id,
                               @RequestBody ItemDto itemDto) {
-        if (userService.findUserById(id) == null) {
-            throw new UserNotFoundException("Пользователь не найден");
-        }
-        itemDto.setOwner(id);
-        Item item = itemService.createItem(ItemMapper.toItem(itemDto));
-        return ItemMapper.toItemDto(item);
+       return itemService.createDtoItem(itemDto, id);
     }
 
     @PatchMapping("/{itemId}")
     public Item updateItem(@RequestHeader("X-Sharer-User-Id") Long id, @PathVariable Long itemId,
                            @RequestBody Item item) {
-        if (!Objects.equals(itemService.findItemById(itemId).getOwner(), id)) {
-            throw new ItemNotFoundException("Вещь не принадлежит юзеру");
-        }
-        item.setId(itemId);
-        return itemService.updateItem(itemService.patchItem(item));
+        return itemService.updateItem(itemService.patchItem(item, itemId, id));
     }
 
     @GetMapping("/{itemId}")

@@ -3,17 +3,24 @@ package ru.practicum.shareit.item;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.InvalidParameterException;
+import ru.practicum.shareit.exception.ItemNotFoundException;
+import ru.practicum.shareit.exception.UserNotFoundException;
+import ru.practicum.shareit.user.UserService;
+import ru.practicum.shareit.user.UserServiceImpl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
+    private final UserServiceImpl userService;
 
     @Autowired
-    public ItemServiceImpl(ItemRepositoryImpl itemRepository) {
+    public ItemServiceImpl(ItemRepositoryImpl itemRepository, UserServiceImpl userService) {
         this.itemRepository = itemRepository;
+        this.userService = userService;
     }
 
     public Item createItem(Item item) {
@@ -64,7 +71,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Item patchItem(Item item) {
+    public Item patchItem(Item item, Long itemId, Long id) {
+        if (!Objects.equals(findItemById(itemId).getOwner(), id)) {
+            throw new ItemNotFoundException("Вещь не принадлежит юзеру");
+        }
+        item.setId(itemId);
+
         Item patchedItem = findItemById(item.getId());
         if (item.getName() != null) {
             patchedItem.setName(item.getName());
@@ -76,5 +88,15 @@ public class ItemServiceImpl implements ItemService {
             patchedItem.setIsAvailable(item.getIsAvailable());
         }
         return patchedItem;
+    }
+
+    @Override
+    public ItemDto createDtoItem(ItemDto itemDto, Long id) {
+        if (userService.findUserById(id) == null) {
+            throw new UserNotFoundException("Пользователь не найден");
+        }
+        itemDto.setOwner(id);
+        Item item = createItem(ItemMapper.toItem(itemDto));
+        return ItemMapper.toItemDto(item);
     }
 }

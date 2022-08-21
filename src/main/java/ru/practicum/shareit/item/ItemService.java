@@ -7,5 +7,7 @@ public interface ItemService {
 
     List<Item> getAllItemsByString(String someText);
 
-    Item patchItem(Item item);
+    Item patchItem(Item item, Long itemId, Long id);
+
+    ItemDto createDtoItem(ItemDto itemDto, Long id);
 }
