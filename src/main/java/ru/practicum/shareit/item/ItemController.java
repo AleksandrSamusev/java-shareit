@@ -3,12 +3,10 @@ package ru.practicum.shareit.item;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.exception.ItemNotFoundException;
-import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.user.UserServiceImpl;
 
 import java.util.List;
-import java.util.Objects;
+
 
 @RestController
 @Slf4j
@@ -26,7 +24,7 @@ public class ItemController {
     @PostMapping
     public ItemDto createItem(@RequestHeader("X-Sharer-User-Id") Long id,
                               @RequestBody ItemDto itemDto) {
-       return itemService.createDtoItem(itemDto, id);
+        return itemService.createDtoItem(itemDto, id);
     }
 
     @PatchMapping("/{itemId}")
