@@ -38,7 +38,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User patchUser(User user) {
+    public User patchUser(User user, Long userId) {
+        user.setId(userId);
         User patchedUser = findUserById(user.getId());
         if (user.getName() != null) {
             patchedUser.setName(user.getName());

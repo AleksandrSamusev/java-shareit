@@ -12,7 +12,7 @@ import java.util.Map;
 @Repository
 public class ItemRepositoryImpl implements ItemRepository {
 
-    Map<Long, Item> items = new HashMap<>();
+    private Map<Long, Item> items = new HashMap<>();
 
     @Override
     public Item createItem(Item item) {
