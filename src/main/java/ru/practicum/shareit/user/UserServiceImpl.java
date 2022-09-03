@@ -1,40 +1,41 @@
 package ru.practicum.shareit.user;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.ValidationException;
 
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
-    @Autowired
-    public UserServiceImpl(UserRepositoryImpl userRepository) {
-        this.userRepository = userRepository;
-    }
-
     public List<User> findAllUsers() {
-        return userRepository.findAllUsers();
+        return userRepository.findAll();
     }
-
 
     public User createUser(User user) {
-        return userRepository.createUser(user);
+        return userRepository.save(user);
     }
 
-
     public User updateUser(User user) {
-        return userRepository.updateUser(user);
+        User temp = userRepository.getReferenceById(user.getId());
+        if (user.getName()!=null && !user.getName().equals("")) {
+            temp.setName(user.getName());
+        }
+        if(user.getEmail()!=null && !user.getEmail().equals("")) {
+            temp.setEmail(user.getEmail());
+        }
+        return userRepository.save(temp);
     }
 
     public void deleteUserById(Long id) {
-        userRepository.deleteUserById(id);
+        userRepository.deleteById(id);
     }
 
     public User findUserById(Long id) {
-        return userRepository.findUserById(id);
+        return userRepository.getReferenceById(id);
     }
 
     @Override

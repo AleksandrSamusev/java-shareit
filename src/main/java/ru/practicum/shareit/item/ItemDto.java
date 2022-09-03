@@ -16,6 +16,6 @@ public class ItemDto {
     @NotNull
     @JsonProperty(value = "available")
     private Boolean isAvailable;
-    private Long owner;
-    private ItemRequest request;
+    private Long ownerId;
+    private Long requestId;
 }
