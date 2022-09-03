@@ -2,6 +2,8 @@ package ru.practicum.shareit.user;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exception.InvalidParameterException;
+import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 
 import java.util.List;
@@ -16,6 +18,9 @@ public class UserServiceImpl implements UserService {
     }
 
     public User createUser(User user) {
+        if (user.getEmail() == null || !user.getEmail().contains("@")) {
+            throw new InvalidParameterException("email is null");
+        }
         return userRepository.save(user);
     }
 
@@ -35,6 +40,9 @@ public class UserServiceImpl implements UserService {
     }
 
     public User findUserById(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new UserNotFoundException("User not found");
+        }
         return userRepository.getReferenceById(id);
     }
 

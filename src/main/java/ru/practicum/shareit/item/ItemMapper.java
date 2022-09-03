@@ -1,8 +1,11 @@
 package ru.practicum.shareit.item;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ItemMapper {
 
     public static ItemDto toItemDto(Item item) {
@@ -12,8 +15,8 @@ public class ItemMapper {
         itemDto.setName(item.getName());
         itemDto.setDescription(item.getDescription());
         itemDto.setIsAvailable(item.getIsAvailable());
-        itemDto.setOwner(item.getOwner());
-        itemDto.setRequest(item.getRequest());
+        itemDto.setOwnerId(item.getOwnerId());
+        itemDto.setRequestId(item.getRequestId());
         return itemDto;
     }
 
@@ -23,8 +26,8 @@ public class ItemMapper {
         item.setName(itemDto.getName());
         item.setDescription(itemDto.getDescription());
         item.setIsAvailable(itemDto.getIsAvailable());
-        item.setOwner(itemDto.getOwner());
-        item.setRequest(itemDto.getRequest());
+        item.setOwnerId(itemDto.getOwnerId());
+        item.setRequestId(itemDto.getRequestId());
         return item;
     }
 }

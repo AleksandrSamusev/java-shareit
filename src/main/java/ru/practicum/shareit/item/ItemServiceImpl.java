@@ -1,7 +1,9 @@
 package ru.practicum.shareit.item;
 
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import ru.practicum.shareit.exception.InvalidParameterException;
 import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.user.UserServiceImpl;
@@ -11,30 +13,44 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-@AllArgsConstructor
+
 public class ItemServiceImpl implements ItemService {
+
     private final ItemRepository itemRepository;
     private final UserServiceImpl userService;
 
+    @Autowired
+    public ItemServiceImpl(ItemRepository itemRepository, UserServiceImpl userService) {
+        this.itemRepository = itemRepository;
+        this.userService = userService;
+    }
+
     public Item createItem(Item item) {
+        if (item.getIsAvailable() == null) {
+            throw new InvalidParameterException("Item isAvailable is empty");
+        } else if (item.getName() == null || item.getName().equals("")) {
+            throw new InvalidParameterException("Item name is empty");
+        } else if (item.getDescription() == null || item.getDescription().equals("")) {
+            throw new InvalidParameterException("Item description is empty");
+        }
         return itemRepository.save(item);
     }
 
     public Item updateItem(Item item) {
         Item temp = itemRepository.getReferenceById(item.getId());
-        if (item.getName()!=null && !item.getName().equals("")) {
+        if (item.getName() != null && !item.getName().equals("")) {
             temp.setName(item.getName());
         }
-        if(item.getIsAvailable() != null) {
+        if (item.getIsAvailable() != null) {
             temp.setIsAvailable(item.getIsAvailable());
         }
-        if(item.getDescription()!=null && !item.getDescription().equals("")) {
+        if (item.getDescription() != null && !item.getDescription().equals("")) {
             temp.setDescription(item.getDescription());
         }
-        if(item.getOwnerId()!=null && item.getOwnerId()!=0) {
+        if (item.getOwnerId() != null && item.getOwnerId() != 0) {
             temp.setOwnerId(item.getOwnerId());
         }
-        if(item.getRequestId()!=null && item.getRequestId()!=0) {
+        if (item.getRequestId() != null && item.getRequestId() != 0) {
             temp.setRequestId(item.getRequestId());
         }
         return itemRepository.save(temp);
@@ -45,6 +61,9 @@ public class ItemServiceImpl implements ItemService {
     }
 
     public Item findItemById(Long id) {
+        if (!itemRepository.existsById(id)) {
+            throw new ItemNotFoundException("Item not found");
+        }
         return itemRepository.getReferenceById(id);
     }
 
