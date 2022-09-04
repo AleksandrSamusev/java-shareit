@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.UserServiceImpl;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @RestController
@@ -34,7 +35,7 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public Item findItemById(@PathVariable Long itemId) {
+    public Optional<Item> findItemById(@PathVariable Long itemId) {
         return itemService.findItemById(itemId);
     }
 

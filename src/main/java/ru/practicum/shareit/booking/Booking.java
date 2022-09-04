@@ -20,20 +20,21 @@ public class Booking {
     @Column(name = "booking_id")
     private Long id;
 
-    @Column(name = "start_date")
+    @Column(name = "start_date", nullable = false)
     private LocalDateTime start;
 
-    @Column(name = "end_date")
+    @Column(name = "end_date", nullable = false)
     private LocalDateTime end;
 
-    @Column(name = "item_id")
+    @Column(name = "item_id", nullable = false)
     private Long itemId;
 
-    @Column(name = "booker_id")
+    @Column(name = "booker_id", nullable = false)
     private Long booker;
 
-    @Column(name = "status")
-    private BookingStatus status;
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private BookingStatus status = BookingStatus.WAITING;
 
     @Override
     public boolean equals(Object o) {

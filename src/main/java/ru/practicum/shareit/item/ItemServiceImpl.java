@@ -10,6 +10,7 @@ import ru.practicum.shareit.user.UserServiceImpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 
@@ -59,11 +60,11 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.findAll();
     }
 
-    public Item findItemById(Long id) {
+    public Optional<Item> findItemById(Long id) {
         if (!itemRepository.existsById(id)) {
             throw new ItemNotFoundException("Item not found");
         }
-        return itemRepository.getReferenceById(id);
+        return itemRepository.findById(id);
     }
 
     public void deleteItemById(Long id) {
@@ -92,27 +93,32 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Item patchItem(Item item, Long itemId, Long id) {
-        if (!Objects.equals(itemRepository.getReferenceById(itemId).getOwnerId(), id)) {
-            throw new ItemNotFoundException("Вещь не принадлежит юзеру");
+        if (findItemById(itemId).isPresent()) {
+            if (!Objects.equals(findItemById(itemId).get().getOwnerId(), id)) {
+                throw new ItemNotFoundException("Вещь не принадлежит юзеру");
+            }
         }
         item.setId(itemId);
-
-        Item patchedItem = findItemById(item.getId());
-        if (item.getName() != null) {
-            patchedItem.setName(item.getName());
+        if (findItemById(item.getId()).isPresent()) {
+            Item patchedItem = findItemById(item.getId()).get();
+            if (item.getName() != null) {
+                patchedItem.setName(item.getName());
+            }
+            if (item.getDescription() != null) {
+                patchedItem.setDescription(item.getDescription());
+            }
+            if (item.getIsAvailable() != null) {
+                patchedItem.setIsAvailable(item.getIsAvailable());
+            }
+            return patchedItem;
+        } else {
+            throw new ItemNotFoundException("Item not found");
         }
-        if (item.getDescription() != null) {
-            patchedItem.setDescription(item.getDescription());
-        }
-        if (item.getIsAvailable() != null) {
-            patchedItem.setIsAvailable(item.getIsAvailable());
-        }
-        return patchedItem;
     }
 
     @Override
     public ItemDto createDtoItem(ItemDto itemDto, Long id) {
-        if (userService.findUserById(id) == null) {
+        if (userService.findUserById(id).isEmpty()) {
             throw new UserNotFoundException("Пользователь не найден");
         }
         itemDto.setOwnerId(id);
