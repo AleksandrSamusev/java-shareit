@@ -1,15 +1,16 @@
 package ru.practicum.shareit.booking;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "booking")
+@Table(name = "bookings")
 @Getter
 @Setter
 @ToString
@@ -29,8 +30,8 @@ public class Booking {
     @Column(name = "item_id", nullable = false)
     private Long itemId;
 
-    @Column(name = "booker_id", nullable = false)
-    private Long booker;
+    @Column(name = "booker_id")
+    private Long bookerId;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
