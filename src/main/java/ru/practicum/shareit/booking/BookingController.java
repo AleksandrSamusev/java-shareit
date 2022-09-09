@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @Slf4j
@@ -26,20 +25,25 @@ public class BookingController {
     }
 
     @GetMapping("/{bookingId}")
-    public BookingWithItemNameDto findBookingById(@RequestHeader("X-Sharer-User-Id") Long id,
-                                                  @PathVariable Long bookingId) {
+    public BookingDto findBookingById(@RequestHeader("X-Sharer-User-Id") Long id,
+                                      @PathVariable Long bookingId) {
         return bookingService.findBookingById(id, bookingId);
     }
 
     @GetMapping
-    public List<Booking> findAllBookingsById(@RequestHeader("X-Sharer-User-Id") Long id) {
-        return bookingService.findAllBookingById(id);
+    public List<Booking> findAllBookingsById(@RequestParam (defaultValue = "ALL") BookingStatus status,
+                                             @RequestHeader("X-Sharer-User-Id") Long id) {
+
+        return bookingService.findBookingByIdAndStatus(status, id);
     }
 
     @PatchMapping("/{bookingId}")
-    public BookingWithItemNameDto confirmOrRejectBooking(@RequestHeader("X-Sharer-User-Id") Long id,
-                                          @PathVariable Long bookingId,
-                                          @RequestParam Boolean approved) {
+    public BookingDto confirmOrRejectBooking(@RequestHeader("X-Sharer-User-Id") Long id,
+                                             @PathVariable Long bookingId,
+                                             @RequestParam Boolean approved) {
         return bookingService.confirmOrRejectBooking(id,bookingId, approved);
     }
+
+    //@GetMapping("/owner")
+
 }

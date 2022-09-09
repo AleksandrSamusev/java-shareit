@@ -18,34 +18,34 @@ public class UserServiceImpl implements UserService {
         this.userRepository = userRepository;
     }
 
-    public List<User> findAllUsers() {
-        return userRepository.findAll();
+    public List<UserDto> findAllUsers() {
+        return UserMapper.toUserDtos(userRepository.findAll());
     }
 
-    public Optional<User> findUserById(Long id) {
-        if (userRepository.findById(id).isPresent()) {
-            return userRepository.findById(id);
+    public UserDto findUserById(Long id) {
+        if (userRepository.getReferenceById(id).getId() != null) {
+            return UserMapper.toUserDto(userRepository.getReferenceById(id));
         } else {
             throw new UserNotFoundException("User not found");
         }
     }
 
-    public User createUser(User user) {
-        if (user.getEmail() == null || !user.getEmail().contains("@")) {
+    public UserDto createUser(UserDto userDto) {
+        if (userDto.getEmail() == null || !userDto.getEmail().contains("@")) {
             throw new InvalidParameterException("email is null");
         }
-        return userRepository.save(user);
+        return UserMapper.toUserDto(userRepository.save(UserMapper.toUser(userDto)));
     }
 
-    public User updateUser(User user) {
-        User temp = userRepository.getReferenceById(user.getId());
-        if (user.getName() != null && !user.getName().equals("")) {
-            temp.setName(user.getName());
+    public UserDto updateUser(UserDto userDto) {
+        UserDto temp = UserMapper.toUserDto(userRepository.getReferenceById(userDto.getId()));
+        if (userDto.getName() != null && !userDto.getName().equals("")) {
+            temp.setName(userDto.getName());
         }
-        if (user.getEmail() != null && !user.getEmail().equals("")) {
-            temp.setEmail(user.getEmail());
+        if (userDto.getEmail() != null && !userDto.getEmail().equals("")) {
+            temp.setEmail(userDto.getEmail());
         }
-        return userRepository.save(temp);
+        return UserMapper.toUserDto(userRepository.save(UserMapper.toUser(temp)));
     }
 
     public void deleteUserById(Long id) {
@@ -53,20 +53,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User patchUser(User user, Long userId) {
-        user.setId(userId);
-        if (findUserById(user.getId()).isPresent()) {
-            User patchedUser = findUserById(user.getId()).get();
-            if (user.getName() != null) {
-                patchedUser.setName(user.getName());
+    public UserDto patchUser(UserDto userDto, Long userId) {
+        userDto.setId(userId);
+        if (findUserById(userDto.getId()) != null) {
+            UserDto patchedUser = findUserById(userDto.getId());
+            if (userDto.getName() != null) {
+                patchedUser.setName(userDto.getName());
             }
-            if (user.getEmail() != null) {
-                for (User storedUser : findAllUsers()) {
-                    if (user.getEmail().equals(storedUser.getEmail())) {
+            if (userDto.getEmail() != null) {
+                for (UserDto storedUser : findAllUsers()) {
+                    if (userDto.getEmail().equals(storedUser.getEmail())) {
                         throw new ValidationException("Email уже есть в базе");
                     }
                 }
-                patchedUser.setEmail(user.getEmail());
+                patchedUser.setEmail(userDto.getEmail());
             }
             return patchedUser;
         } else {

@@ -1,11 +1,10 @@
 package ru.practicum.shareit.booking;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.springframework.format.annotation.DateTimeFormat;
-
+import ru.practicum.shareit.item.Item;
+import ru.practicum.shareit.user.User;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
@@ -27,11 +26,13 @@ public class Booking {
     @Column(name = "end_date", nullable = false)
     private LocalDateTime end;
 
-    @Column(name = "item_id", nullable = false)
-    private Long itemId;
+    @ManyToOne
+    @JoinColumn(name = "item_id")
+    private Item item;
 
-    @Column(name = "booker_id")
-    private Long bookerId;
+    @ManyToOne
+    @JoinColumn(name = "booker_id")
+    private User booker;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)

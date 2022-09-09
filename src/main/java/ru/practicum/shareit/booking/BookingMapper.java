@@ -1,23 +1,33 @@
 package ru.practicum.shareit.booking;
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.item.Item;
-import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.item.ItemMapper;
+import ru.practicum.shareit.user.UserMapper;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class BookingMapper {
 
-    public static BookingWithItemNameDto toBookingWithNameDto(Booking booking, Item item, User booker) {
-        BookingWithItemNameDto bookingWithItemNameDto = new BookingWithItemNameDto();
+    public static BookingDto toBookingDto(Booking booking) {
+        BookingDto bookingDto = new BookingDto();
 
-        bookingWithItemNameDto.setId(booking.getId());
-        bookingWithItemNameDto.setStart(booking.getStart());
-        bookingWithItemNameDto.setEnd(booking.getEnd());
-        bookingWithItemNameDto.setStatus(booking.getStatus());
-        bookingWithItemNameDto.setBooker(booker);
-        bookingWithItemNameDto.setItem(item);
-        bookingWithItemNameDto.setItemName(item.getName());
+        bookingDto.setId(booking.getId());
+        bookingDto.setStart(booking.getStart());
+        bookingDto.setEnd(booking.getEnd());
+        bookingDto.setStatus(booking.getStatus());
+        bookingDto.setBookerDto(UserMapper.toUserDto(booking.getBooker()));
+        bookingDto.setItemDto(ItemMapper.toItemDto(booking.getItem()));
+        bookingDto.setItemName(booking.getItem().getName());
 
-        return bookingWithItemNameDto;
+        return bookingDto;
+    }
+
+    public static List<BookingDto> toBookingDtos(List<Booking> bookings) {
+        List<BookingDto> dtos = new ArrayList<>();
+        for(Booking booking: bookings) {
+            dtos.add(toBookingDto(booking));
+        }
+        return dtos;
     }
 
 

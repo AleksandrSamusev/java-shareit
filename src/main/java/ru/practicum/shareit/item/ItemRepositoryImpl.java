@@ -17,7 +17,7 @@ public class ItemRepositoryImpl  implements ItemRepositoryCustom{
 
     @Override
     public List<Item> findAllItemsByOwner(Long id) {
-        return itemRepository.findAll().stream().filter((s) -> s.getOwnerId().equals(id))
+        return itemRepository.findAll().stream().filter((s) -> s.getOwner().getId().equals(id))
                 .collect(Collectors.toList());
 
     }

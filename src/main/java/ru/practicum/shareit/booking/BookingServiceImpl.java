@@ -9,6 +9,7 @@ import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -19,7 +20,8 @@ public class BookingServiceImpl {
     private final UserRepository userRepository;
 
     @Autowired
-    public BookingServiceImpl(BookingRepository bookingRepository, ItemRepository itemRepository, UserRepository userRepository) {
+    public BookingServiceImpl(BookingRepository bookingRepository, ItemRepository itemRepository,
+                              UserRepository userRepository) {
         this.bookingRepository = bookingRepository;
         this.itemRepository = itemRepository;
         this.userRepository = userRepository;
@@ -35,38 +37,34 @@ public class BookingServiceImpl {
         if (booking.getStart().isBefore(LocalDateTime.now())) {
             throw new InvalidParameterException("Start date in past");
         }
-        if (!itemRepository.existsById(booking.getItemId())) {
+        if (itemRepository.findById(booking.getItem().getId()).get().getId()==null) {
             throw new ItemNotFoundException("Item not found");
         }
         if (!userRepository.existsById(id)) {
             throw new UserNotFoundException("User not found");
         }
-        if (itemRepository.findById(booking.getItemId()).isPresent()) {
-            if (itemRepository.findById(booking.getItemId()).get().getIsAvailable() == Boolean.FALSE) {
+        if (itemRepository.findById(booking.getItem().getId()).isPresent()) {
+            if (itemRepository.findById(booking.getItem().getId()).get().getIsAvailable() == Boolean.FALSE) {
                 throw new InvalidParameterException("Item is unavailable");
             }
         }
-        booking.setBookerId(id);
+
+        booking.setBooker(userRepository.findById(id).get());
         return bookingRepository.save(booking);
     }
 
-    public BookingWithItemNameDto findBookingById(Long id, Long bookingId) {
-/*        if (!id.equals(bookingRepository.findById(bookingId).get().getBookerId()) &&
-                !id.equals(itemRepository.findById(bookingRepository.findById(bookingId).get().getItemId()).get().getOwnerId())) {
-            throw new ValidationException("Information available only for booker or item owner.");
-        }*/
-
+    public BookingDto findBookingById(Long id, Long bookingId) {
         if (bookingRepository.findById(bookingId).isPresent()) {
             Booking tempBooking = bookingRepository.findById(bookingId).get();
-            Item tempItem = itemRepository.findById(bookingRepository.findById(bookingId).get().getItemId()).get();
-            User tempBooker = userRepository.findById(bookingRepository.findById(bookingId).get().getBookerId()).get();
-            return BookingMapper.toBookingWithNameDto(tempBooking, tempItem, tempBooker);
+            Item tempItem = itemRepository.findById(bookingRepository.findById(bookingId).get().getItem().getId()).get();
+            User tempBooker = userRepository.findById(bookingRepository.findById(bookingId).get().getBooker().getId()).get();
+            return BookingMapper.toBookingDto(tempBooking, tempItem, tempBooker);
         } else {
             throw new BookingNotFoundException("Booking not found");
         }
     }
 
-    public BookingWithItemNameDto confirmOrRejectBooking(Long id, Long bookingId, Boolean approved) {
+    public BookingDto confirmOrRejectBooking(Long id, Long bookingId, Boolean approved) {
 
         if (bookingRepository.findById(bookingId).isPresent()) {
             Booking tempBooking = bookingRepository.findById(bookingId).get();
@@ -77,18 +75,44 @@ public class BookingServiceImpl {
                 tempBooking.setStatus(BookingStatus.REJECTED);
             }
             bookingRepository.save(tempBooking);
-            Item tempItem = itemRepository.findById(bookingRepository.findById(bookingId).get().getItemId()).get();
-            User tempBooker = userRepository.findById(bookingRepository.findById(bookingId).get().getBookerId()).get();
-            return BookingMapper.toBookingWithNameDto(tempBooking, tempItem, tempBooker);
+            Item tempItem = itemRepository.findById(bookingRepository.findById(bookingId).get().getItem().getId()).get();
+            User tempBooker = userRepository.findById(bookingRepository.findById(bookingId).get().getBooker().getId()).get();
+            return BookingMapper.toBookingDto(tempBooking, tempItem, tempBooker);
         } else {
             throw new BookingNotFoundException("Booking not found");
         }
     }
 
-    public List<Booking> findAllBookingById(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new UserNotFoundException("User not found");
+    public List<Booking> findBookingByIdAndStatus(BookingStatus status, Long id) {
+        if (userRepository.existsById(id)) {
+            if (status.equals(BookingStatus.ALL)) {
+                List<Booking> list1 = bookingRepository.findBookingsByBookerId(id);
+                list1.sort(Comparator.comparing(Booking::getStart));
+                return list1;
+            } else if (status.equals(BookingStatus.CURRENT)) {
+                List<Booking> list2 = bookingRepository.findBookingsByBookerIdWithCurrentStatus(id);
+                list2.sort(Comparator.comparing(Booking::getStart));
+                return list2;
+            } else if (status.equals(BookingStatus.PAST)) {
+                List<Booking> list3 = bookingRepository.findBookingsByBookerIdWithPastStatus(id);
+                list3.sort(Comparator.comparing(Booking::getStart));
+                return list3;
+            } else if (status.equals(BookingStatus.FUTURE)) {
+                List<Booking> list4 = bookingRepository.findBookingsByBookerIdWithFutureStatus(id);
+                list4.sort(Comparator.comparing(Booking::getStart));
+                return list4;
+            } else if (status.equals(BookingStatus.WAITING)) {
+                List<Booking> list5 = bookingRepository.findBookingsByBookerIdWithWaitingOrRejectStatus(id,
+                        BookingStatus.WAITING);
+                list5.sort(Comparator.comparing(Booking::getStart));
+                return list5;
+            } else if (status.equals(BookingStatus.REJECTED)) {
+                List<Booking> list6 = bookingRepository.findBookingsByBookerIdWithWaitingOrRejectStatus(id,
+                        BookingStatus.REJECTED);
+                list6.sort(Comparator.comparing(Booking::getStart));
+                return list6;
+            }
         }
-        return bookingRepository.findAll();
+        throw new UserNotFoundException("User not found");
     }
 }
