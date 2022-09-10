@@ -31,10 +31,10 @@ public class BookingController {
     }
 
     @GetMapping
-    public List<BookingDto> findAllBookingsById(@RequestParam (defaultValue = "ALL") BookingStatus status,
+    public List<BookingDto> findAllBookingsById(@RequestParam (defaultValue = "ALL") String state,
                                              @RequestHeader("X-Sharer-User-Id") Long id) {
 
-        return bookingService.findBookingByIdAndStatus(status, id);
+        return bookingService.findBookingByIdAndStatus(state, id);
     }
 
     @PatchMapping("/{bookingId}")

@@ -28,6 +28,10 @@ public class BookingServiceImpl {
     }
 
     public BookingDto create(Long id, BookingSmallDto bookingSmallDto) {
+        if (id.equals(itemRepository.getReferenceById(
+                bookingSmallDto.getItemId()).getOwner().getId())) {
+            throw new ItemNotFoundException("Illegal operation");
+        }
         if (bookingSmallDto.getEnd().isBefore(LocalDateTime.now())) {
             throw new InvalidParameterException("End date in past");
         }
@@ -85,6 +89,16 @@ public class BookingServiceImpl {
     }
 
     public BookingDto confirmOrRejectBooking(Long id, Long bookingId, Boolean approved) {
+        if (bookingRepository.getReferenceById(bookingId).getBooker().getId().equals(id)
+                && approved && bookingRepository.getReferenceById(bookingId).getId().equals(bookingId)) {
+            throw new BookingNotFoundException("Booking is already approved");
+        }
+
+/*        if (itemRepository.getReferenceById(bookingRepository.getReferenceById(bookingId).getItem().getId())
+                .getOwner().getId().equals(id)
+                && approved && bookingRepository.getReferenceById(bookingId).getId().equals(bookingId)) {
+            throw new ValidationException("Illegal operation");
+        }*/
 
         if (bookingRepository.getReferenceById(bookingId).getId() != null) {
             Booking tempBooking = bookingRepository.getReferenceById(bookingId);
@@ -102,8 +116,17 @@ public class BookingServiceImpl {
         }
     }
 
-    public List<BookingDto> findBookingByIdAndStatus(BookingStatus status, Long id) {
+    public List<BookingDto> findBookingByIdAndStatus(String state, Long id) {
         if (userRepository.existsById(id)) {
+            if (!state.equals(BookingStatus.ALL.name()) && !state.equals(BookingStatus.REJECTED.name())
+                    && !state.equals(BookingStatus.WAITING.name()) && !state.equals(BookingStatus.CURRENT.name())
+                    && !state.equals(BookingStatus.APPROVED.name()) && !state.equals(BookingStatus.CANCELED.name())
+                    && !state.equals(BookingStatus.PAST.name()) && !state.equals(BookingStatus.FUTURE.name())) {
+
+                throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
+            }
+            BookingStatus status = BookingStatus.valueOf(state);
+
             if (status.equals(BookingStatus.ALL)) {
                 List<Booking> list1 = bookingRepository.findBookingsByBookerId(id);
                 list1.sort(Comparator.comparing(Booking::getStart).reversed());
@@ -152,6 +175,12 @@ public class BookingServiceImpl {
                 list.sort(Comparator.comparing(Booking::getStart).reversed());
                 return BookingMapper.toBookingDtos(list);
             }
+            if (status == BookingStatus.FUTURE) {
+                List<Booking> list = bookingRepository.findAllOwnersBookingsWithFutureStatus(id);
+                list.sort(Comparator.comparing(Booking::getStart).reversed());
+                return BookingMapper.toBookingDtos(list);
+            }
+
             List<Booking> list = bookingRepository.findAllOwnersBookingsWithStatus(id, status);
             list.sort(Comparator.comparing(Booking::getStart).reversed());
             return BookingMapper.toBookingDtos(list);

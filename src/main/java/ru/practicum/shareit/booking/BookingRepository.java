@@ -21,7 +21,7 @@ public interface BookingRepository extends
 
 
     @Query("SELECT b FROM Booking b WHERE b.booker.id = ?1 AND" +
-            " b.start > CURRENT_TIMESTAMP AND b.end > CURRENT_TIMESTAMP")
+            " b.start > CURRENT_TIMESTAMP ")
     List<Booking> findBookingsByBookerIdWithFutureStatus(Long id);
 
     @Query("SELECT b FROM Booking b WHERE b.booker.id = ?1 AND  b.status = ?2")
@@ -29,12 +29,19 @@ public interface BookingRepository extends
 
 
 
-    @Query(value = "SELECT b FROM Booking AS b WHERE b.item.id IN (SELECT it FROM Item AS it WHERE it.owner.id = ?1) " +
+
+
+
+   @Query(value = "SELECT b FROM Booking AS b WHERE b.item.id IN (SELECT it FROM Item AS it WHERE it.owner.id = ?1) " +
             "AND b.status  = ?2 " )
     List<Booking> findAllOwnersBookingsWithStatus(Long id, BookingStatus status);
 
     @Query(value = "SELECT b FROM Booking AS b WHERE b.item.id IN (SELECT it FROM Item AS it WHERE it.owner.id = ?1) ")
     List<Booking> findAllOwnersBookings(Long id);
+
+    @Query(value = "SELECT b FROM Booking AS b WHERE b.item.id IN (SELECT it FROM Item AS it WHERE it.owner.id = ?1) " +
+            "AND b.start > CURRENT_TIMESTAMP " )
+    List<Booking> findAllOwnersBookingsWithFutureStatus(Long id);
     
 
 }
