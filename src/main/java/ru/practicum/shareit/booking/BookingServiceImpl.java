@@ -85,6 +85,7 @@ public class BookingServiceImpl {
     }
 
     public BookingDto confirmOrRejectBooking(Long id, Long bookingId, Boolean approved) {
+
         if (bookingRepository.getReferenceById(bookingId).getId() != null) {
             Booking tempBooking = bookingRepository.getReferenceById(bookingId);
 
@@ -105,58 +106,58 @@ public class BookingServiceImpl {
         if (userRepository.existsById(id)) {
             if (status.equals(BookingStatus.ALL)) {
                 List<Booking> list1 = bookingRepository.findBookingsByBookerId(id);
-                list1.sort(Comparator.comparing(Booking::getStart));
+                list1.sort(Comparator.comparing(Booking::getStart).reversed());
                 return BookingMapper.toBookingDtos(list1);
             } else if (status.equals(BookingStatus.CURRENT)) {
                 List<Booking> list2 = bookingRepository.findBookingsByBookerIdWithCurrentStatus(id);
-                list2.sort(Comparator.comparing(Booking::getStart));
+                list2.sort(Comparator.comparing(Booking::getStart).reversed());
                 return BookingMapper.toBookingDtos(list2);
             } else if (status.equals(BookingStatus.PAST)) {
                 List<Booking> list3 = bookingRepository.findBookingsByBookerIdWithPastStatus(id);
-                list3.sort(Comparator.comparing(Booking::getStart));
+                list3.sort(Comparator.comparing(Booking::getStart).reversed());
                 return BookingMapper.toBookingDtos(list3);
             } else if (status.equals(BookingStatus.FUTURE)) {
                 List<Booking> list4 = bookingRepository.findBookingsByBookerIdWithFutureStatus(id);
-                list4.sort(Comparator.comparing(Booking::getStart));
+                list4.sort(Comparator.comparing(Booking::getStart).reversed());
                 return BookingMapper.toBookingDtos(list4);
             } else if (status.equals(BookingStatus.WAITING)) {
                 List<Booking> list5 = bookingRepository.findBookingsByBookerIdWithWaitingOrRejectStatus(id,
                         BookingStatus.WAITING);
-                list5.sort(Comparator.comparing(Booking::getStart));
+                list5.sort(Comparator.comparing(Booking::getStart).reversed());
                 return BookingMapper.toBookingDtos(list5);
             } else if (status.equals(BookingStatus.REJECTED)) {
                 List<Booking> list6 = bookingRepository.findBookingsByBookerIdWithWaitingOrRejectStatus(id,
                         BookingStatus.REJECTED);
-                list6.sort(Comparator.comparing(Booking::getStart));
+                list6.sort(Comparator.comparing(Booking::getStart).reversed());
                 return BookingMapper.toBookingDtos(list6);
             }
         }
         throw new UserNotFoundException("User not found");
     }
 
-    public List<BookingDto> findAllOwnersBookings(BookingStatus status, Long id) {
-        if (userRepository.existsById(id)) {
-            if (status != BookingStatus.ALL && status != BookingStatus.REJECTED && status != BookingStatus.WAITING
-                    && status != BookingStatus.FUTURE && status != BookingStatus.CURRENT
-                    && status != BookingStatus.APPROVED && status != BookingStatus.CANCELED
-                    && status != BookingStatus.PAST) {
-                throw new InvalidParameterException("UNSUPPORTED_STATUS");
-            }
-            if (status.equals(BookingStatus.ALL)) {
-                return BookingMapper.toBookingDtos(bookingRepository.findAllOwnersBookings(id, BookingStatus.ALL));
-            } else if (status.equals(BookingStatus.CURRENT)) {
-                return BookingMapper.toBookingDtos(bookingRepository.findAllOwnersBookings(id, BookingStatus.CURRENT));
-            } else if (status.equals(BookingStatus.PAST)) {
-                return BookingMapper.toBookingDtos(bookingRepository.findAllOwnersBookings(id, BookingStatus.PAST));
-            } else if (status.equals(BookingStatus.FUTURE)) {
-                return BookingMapper.toBookingDtos(bookingRepository.findAllOwnersBookings(id, BookingStatus.FUTURE));
-            } else if (status.equals(BookingStatus.WAITING)) {
-                return BookingMapper.toBookingDtos(bookingRepository.findAllOwnersBookings(id, BookingStatus.WAITING));
-            } else if (status.equals(BookingStatus.REJECTED)) {
-                return BookingMapper.toBookingDtos(bookingRepository.findAllOwnersBookings(id, BookingStatus.REJECTED));
-            }
-        }
-        throw new UserNotFoundException("User not found");
+    public List<BookingDto> findAllOwnersBookings(String state, Long id) {
 
+        if (userRepository.existsById(id)) {
+            if (!state.equals(BookingStatus.ALL.name()) && !state.equals(BookingStatus.REJECTED.name())
+                    && !state.equals(BookingStatus.WAITING.name()) && !state.equals(BookingStatus.CURRENT.name())
+                    && !state.equals(BookingStatus.APPROVED.name()) && !state.equals(BookingStatus.CANCELED.name())
+                    && !state.equals(BookingStatus.PAST.name()) && !state.equals(BookingStatus.FUTURE.name())) {
+
+                throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
+            }
+            BookingStatus status = BookingStatus.valueOf(state);
+
+            if (status == BookingStatus.ALL) {
+                List<Booking> list = bookingRepository.findAllOwnersBookings(id);
+                list.sort(Comparator.comparing(Booking::getStart).reversed());
+                return BookingMapper.toBookingDtos(list);
+            }
+            List<Booking> list = bookingRepository.findAllOwnersBookingsWithStatus(id, status);
+            list.sort(Comparator.comparing(Booking::getStart).reversed());
+            return BookingMapper.toBookingDtos(list);
+
+        } else {
+            throw new UserNotFoundException("User not found");
+        }
     }
 }
