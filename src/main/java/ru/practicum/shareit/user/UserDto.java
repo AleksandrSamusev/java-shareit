@@ -17,4 +17,8 @@ public class UserDto {
     private String name;
     @Email
     private String email;
+
+    public UserDto(Long id) {
+        this.id = id;
+    }
 }

@@ -15,11 +15,42 @@ public class BookingMapper {
         bookingDto.setStart(booking.getStart());
         bookingDto.setEnd(booking.getEnd());
         bookingDto.setStatus(booking.getStatus());
-        bookingDto.setBookerDto(UserMapper.toUserDto(booking.getBooker()));
-        bookingDto.setItemDto(ItemMapper.toItemDto(booking.getItem()));
+        bookingDto.setBooker(UserMapper.toUserDto(booking.getBooker()));
+        bookingDto.setItem(ItemMapper.toItemDto(booking.getItem()));
         bookingDto.setItemName(booking.getItem().getName());
 
         return bookingDto;
+    }
+
+
+    public static Booking toBooking(BookingDto bookingDto) {
+        Booking booking = new Booking();
+        booking.setId(bookingDto.getId());
+        booking.setStart(bookingDto.getStart());
+        booking.setEnd(bookingDto.getEnd());
+        booking.setStatus(bookingDto.getStatus());
+        booking.setBooker(UserMapper.toUser(bookingDto.getBooker()));
+        booking.setItem(ItemMapper.toItem(bookingDto.getItem()));
+        return booking;
+    }
+
+    public static BookingSmallDto toBookingSmallDto(Booking booking) {
+        BookingSmallDto bookingSmallDto = new BookingSmallDto();
+
+        bookingSmallDto.setId(booking.getId());
+        bookingSmallDto.setStart(booking.getStart());
+        bookingSmallDto.setEnd(booking.getEnd());
+        bookingSmallDto.setItemId(booking.getItem().getId());
+
+        return bookingSmallDto;
+    }
+
+    public static Booking toBookingFromSmallDto(BookingSmallDto bookingSmallDto) {
+        Booking booking = new Booking();
+        booking.setId(bookingSmallDto.getId());
+        booking.setStart(bookingSmallDto.getStart());
+        booking.setEnd(bookingSmallDto.getEnd());
+        return booking;
     }
 
     public static List<BookingDto> toBookingDtos(List<Booking> bookings) {
@@ -29,8 +60,5 @@ public class BookingMapper {
         }
         return dtos;
     }
-
-
-
 
 }

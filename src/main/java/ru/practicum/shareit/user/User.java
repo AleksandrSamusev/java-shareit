@@ -6,7 +6,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 
 @Entity
-@Table(name = "users", schema = "public")
+@Table(name = "users")
 @Getter
 @Setter
 @ToString

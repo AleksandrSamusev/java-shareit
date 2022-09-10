@@ -24,7 +24,11 @@ public class UserServiceImpl implements UserService {
 
     public UserDto findUserById(Long id) {
         if (userRepository.getReferenceById(id).getId() != null) {
-            return UserMapper.toUserDto(userRepository.getReferenceById(id));
+            if (userRepository.existsById(id)) {
+                return UserMapper.toUserDto(userRepository.getReferenceById(id));
+            } else {
+                throw  new UserNotFoundException("User not found");
+            }
         } else {
             throw new UserNotFoundException("User not found");
         }
@@ -34,6 +38,11 @@ public class UserServiceImpl implements UserService {
         if (userDto.getEmail() == null || !userDto.getEmail().contains("@")) {
             throw new InvalidParameterException("email is null");
         }
+/*        for (UserDto user : findAllUsers()) {
+            if (user.getEmail().equals(userDto.getEmail())) {
+                throw new InvalidParameterException("User already registered");
+            }
+        }*/
         return UserMapper.toUserDto(userRepository.save(UserMapper.toUser(userDto)));
     }
 
