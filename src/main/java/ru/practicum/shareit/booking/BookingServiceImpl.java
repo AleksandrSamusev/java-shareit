@@ -28,6 +28,9 @@ public class BookingServiceImpl {
     }
 
     public BookingDto create(Long id, BookingSmallDto bookingSmallDto) {
+        if (!itemRepository.existsById(bookingSmallDto.getItemId())) {
+            throw new ItemNotFoundException("Item not found");
+        }
         if (id.equals(itemRepository.getReferenceById(
                 bookingSmallDto.getItemId()).getOwner().getId())) {
             throw new ItemNotFoundException("Illegal operation");
@@ -41,9 +44,7 @@ public class BookingServiceImpl {
         if (bookingSmallDto.getStart().isBefore(LocalDateTime.now())) {
             throw new InvalidParameterException("Start date in past");
         }
-        if (!itemRepository.existsById(bookingSmallDto.getItemId())) {
-            throw new ItemNotFoundException("Item not found");
-        }
+
         if (!userRepository.existsById(id)) {
             throw new UserNotFoundException("User not found");
         }
@@ -91,14 +92,14 @@ public class BookingServiceImpl {
     public BookingDto confirmOrRejectBooking(Long id, Long bookingId, Boolean approved) {
         if (bookingRepository.getReferenceById(bookingId).getBooker().getId().equals(id)
                 && approved && bookingRepository.getReferenceById(bookingId).getId().equals(bookingId)) {
-            throw new BookingNotFoundException("Booking is already approved");
+            throw new BookingNotFoundException("Item not found");
         }
 
-/*        if (itemRepository.getReferenceById(bookingRepository.getReferenceById(bookingId).getItem().getId())
-                .getOwner().getId().equals(id)
-                && approved && bookingRepository.getReferenceById(bookingId).getId().equals(bookingId)) {
-            throw new ValidationException("Illegal operation");
-        }*/
+        if (approved && bookingRepository.getReferenceById(bookingId).getStatus().equals(BookingStatus.APPROVED)
+                && itemRepository.getReferenceById(bookingRepository.getReferenceById(bookingId)
+                .getItem().getId()).getOwner().getId().equals(id)) {
+            throw new InvalidParameterException("Booking is already approved");
+        }
 
         if (bookingRepository.getReferenceById(bookingId).getId() != null) {
             Booking tempBooking = bookingRepository.getReferenceById(bookingId);
@@ -131,10 +132,12 @@ public class BookingServiceImpl {
                 List<Booking> list1 = bookingRepository.findBookingsByBookerId(id);
                 list1.sort(Comparator.comparing(Booking::getStart).reversed());
                 return BookingMapper.toBookingDtos(list1);
+
             } else if (status.equals(BookingStatus.CURRENT)) {
                 List<Booking> list2 = bookingRepository.findBookingsByBookerIdWithCurrentStatus(id);
                 list2.sort(Comparator.comparing(Booking::getStart).reversed());
                 return BookingMapper.toBookingDtos(list2);
+
             } else if (status.equals(BookingStatus.PAST)) {
                 List<Booking> list3 = bookingRepository.findBookingsByBookerIdWithPastStatus(id);
                 list3.sort(Comparator.comparing(Booking::getStart).reversed());

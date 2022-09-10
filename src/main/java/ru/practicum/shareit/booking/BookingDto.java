@@ -19,6 +19,7 @@ public class BookingDto {
     private LocalDateTime end;
     private BookingStatus status = BookingStatus.WAITING;
     private UserDto booker;
+    private Long bookerId;
     private ItemDto item;
     private String itemName;
 }

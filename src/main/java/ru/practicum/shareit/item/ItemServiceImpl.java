@@ -2,11 +2,18 @@ package ru.practicum.shareit.item;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.BookingDto;
+import ru.practicum.shareit.booking.BookingMapper;
+import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.exception.InvalidParameterException;
 import ru.practicum.shareit.exception.ItemNotFoundException;
+import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.user.UserMapper;
+import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.UserServiceImpl;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -17,11 +24,16 @@ public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
     private final UserServiceImpl userService;
+    private final BookingRepository bookingRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public ItemServiceImpl(ItemRepository itemRepository, UserServiceImpl userService) {
+    public ItemServiceImpl(ItemRepository itemRepository, UserServiceImpl userService,
+                           BookingRepository bookingRepository, UserRepository userRepository) {
         this.itemRepository = itemRepository;
         this.userService = userService;
+        this.bookingRepository = bookingRepository;
+        this.userRepository = userRepository;
     }
 
     public ItemDto createItem(Long id, ItemDto itemDto) {
@@ -60,11 +72,32 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.findAll();
     }
 
-    public ItemDto findItemById(Long id) {
+    public ItemDto findItemById(Long userId, Long id) {
         if (!itemRepository.existsById(id)) {
             throw new ItemNotFoundException("Item not found");
         }
-        return ItemMapper.toItemDto(itemRepository.getReferenceById(id));
+
+        ItemDto itemDto = ItemMapper.toItemDto(itemRepository.getReferenceById(id));
+
+        if (Objects.equals(itemRepository.getReferenceById(id).getOwner().getId(), userId)) {
+            List<Booking> bookingPast = bookingRepository.findAllItemBookingsPast(id);
+            if (bookingPast.size() != 0) {
+                bookingPast.sort(Comparator.comparing(Booking::getStart).reversed());
+                BookingDto bookingDtoPast = BookingMapper.toBookingDto(bookingPast.get(0));
+                bookingDtoPast.setBookerId(bookingDtoPast.getBooker().getId());
+                bookingDtoPast.setBooker(null);
+                itemDto.setLastBooking(bookingDtoPast);
+            }
+            List<Booking> bookingFuture = bookingRepository.findAllItemBookingsFuture(id);
+            if (bookingFuture.size() != 0) {
+                bookingFuture.sort(Comparator.comparing(Booking::getStart));
+                BookingDto bookingDtoFuture = BookingMapper.toBookingDto(bookingFuture.get(0));
+                bookingDtoFuture.setBookerId(bookingDtoFuture.getBooker().getId());
+                bookingDtoFuture.setBooker(null);
+                itemDto.setNextBooking(bookingDtoFuture);
+            }
+        }
+        return itemDto;
     }
 
     public void deleteItemById(Long id) {
@@ -73,8 +106,35 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> findAllItemsByOwner(Long id) {
-        return ItemMapper.toItemDtos(itemRepository.findAllItemsByOwner(id));
+        if (!userRepository.existsById(id)) {
+            throw new UserNotFoundException("User not found");
+        }
+            List<ItemDto> itemDtoList = ItemMapper.toItemDtos(itemRepository.findAllItemsByOwner(id));
+            for (ItemDto itemDto: itemDtoList) {
+                List<Booking> bookingPast = bookingRepository.findAllItemBookingsPast(itemDto.getId());
+                if (bookingPast.size() != 0) {
+                    bookingPast.sort(Comparator.comparing(Booking::getStart).reversed());
+                    BookingDto bookingDtoPast = BookingMapper.toBookingDto(bookingPast.get(0));
+                    bookingDtoPast.setBookerId(bookingDtoPast.getBooker().getId());
+                    bookingDtoPast.setBooker(null);
+                    itemDto.setLastBooking(bookingDtoPast);
+                }
+                List<Booking> bookingFuture = bookingRepository.findAllItemBookingsFuture(itemDto.getId());
+                if (bookingFuture.size() != 0) {
+                    bookingFuture.sort(Comparator.comparing(Booking::getStart));
+                    BookingDto bookingDtoFuture = BookingMapper.toBookingDto(bookingFuture.get(0));
+                    bookingDtoFuture.setBookerId(bookingDtoFuture.getBooker().getId());
+                    bookingDtoFuture.setBooker(null);
+                    itemDto.setNextBooking(bookingDtoFuture);
+                }
+            }
+            itemDtoList.sort(Comparator.comparing(ItemDto::getId));
+            return itemDtoList;
     }
+
+
+
+
 
     @Override
     public List<ItemDto> getAllItemsByString(String someText) {
@@ -93,14 +153,14 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto patchItem(ItemDto itemDto, Long itemId, Long id) {
-        if (findItemById(itemId) != null) {
-            if (!Objects.equals(findItemById(itemId).getOwner().getId(), id)) {
+        if (findItemById(id, itemId) != null) {
+            if (!Objects.equals(findItemById(id, itemId).getOwner().getId(), id)) {
                 throw new ItemNotFoundException("Вещь не принадлежит юзеру");
             }
         }
         itemDto.setId(itemId);
-        if (findItemById(itemDto.getId()) != null) {
-            ItemDto patchedItem = findItemById(itemDto.getId());
+        if (findItemById(id, itemDto.getId()) != null) {
+            ItemDto patchedItem = findItemById(id, itemDto.getId());
             if (itemDto.getName() != null) {
                 patchedItem.setName(itemDto.getName());
             }

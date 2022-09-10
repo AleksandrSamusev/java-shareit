@@ -38,11 +38,6 @@ public class UserServiceImpl implements UserService {
         if (userDto.getEmail() == null || !userDto.getEmail().contains("@")) {
             throw new InvalidParameterException("email is null");
         }
-/*        for (UserDto user : findAllUsers()) {
-            if (user.getEmail().equals(userDto.getEmail())) {
-                throw new InvalidParameterException("User already registered");
-            }
-        }*/
         return UserMapper.toUserDto(userRepository.save(UserMapper.toUser(userDto)));
     }
 
