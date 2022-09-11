@@ -7,8 +7,6 @@ import ru.practicum.shareit.comment.CommentDto;
 import ru.practicum.shareit.user.UserServiceImpl;
 
 import java.util.List;
-import java.util.Optional;
-
 
 @RestController
 @Slf4j

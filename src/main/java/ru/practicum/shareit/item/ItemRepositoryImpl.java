@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item;
 
-import jdk.jfr.Label;
 import org.springframework.context.annotation.Lazy;
 
 import java.util.List;
