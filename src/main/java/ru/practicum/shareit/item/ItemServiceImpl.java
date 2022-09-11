@@ -6,16 +6,19 @@ import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingDto;
 import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.comment.Comment;
+import ru.practicum.shareit.comment.CommentDto;
+import ru.practicum.shareit.comment.CommentMapper;
+import ru.practicum.shareit.comment.CommentRepository;
 import ru.practicum.shareit.exception.InvalidParameterException;
 import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.UserServiceImpl;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+
+import java.time.LocalDateTime;
+import java.util.*;
 
 
 @Service
@@ -26,14 +29,17 @@ public class ItemServiceImpl implements ItemService {
     private final UserServiceImpl userService;
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
 
     @Autowired
     public ItemServiceImpl(ItemRepository itemRepository, UserServiceImpl userService,
-                           BookingRepository bookingRepository, UserRepository userRepository) {
+                           BookingRepository bookingRepository,
+                           UserRepository userRepository, CommentRepository commentRepository) {
         this.itemRepository = itemRepository;
         this.userService = userService;
         this.bookingRepository = bookingRepository;
         this.userRepository = userRepository;
+        this.commentRepository = commentRepository;
     }
 
     public ItemDto createItem(Long id, ItemDto itemDto) {
@@ -76,8 +82,11 @@ public class ItemServiceImpl implements ItemService {
         if (!itemRepository.existsById(id)) {
             throw new ItemNotFoundException("Item not found");
         }
-
         ItemDto itemDto = ItemMapper.toItemDto(itemRepository.getReferenceById(id));
+        Set<Comment> comments = commentRepository.findAllItemComments(id);
+        for (Comment comment : comments) {
+            itemDto.getComments().add(CommentMapper.toCommentDto(comment));
+        }
 
         if (Objects.equals(itemRepository.getReferenceById(id).getOwner().getId(), userId)) {
             List<Booking> bookingPast = bookingRepository.findAllItemBookingsPast(id);
@@ -109,32 +118,28 @@ public class ItemServiceImpl implements ItemService {
         if (!userRepository.existsById(id)) {
             throw new UserNotFoundException("User not found");
         }
-            List<ItemDto> itemDtoList = ItemMapper.toItemDtos(itemRepository.findAllItemsByOwner(id));
-            for (ItemDto itemDto: itemDtoList) {
-                List<Booking> bookingPast = bookingRepository.findAllItemBookingsPast(itemDto.getId());
-                if (bookingPast.size() != 0) {
-                    bookingPast.sort(Comparator.comparing(Booking::getStart).reversed());
-                    BookingDto bookingDtoPast = BookingMapper.toBookingDto(bookingPast.get(0));
-                    bookingDtoPast.setBookerId(bookingDtoPast.getBooker().getId());
-                    bookingDtoPast.setBooker(null);
-                    itemDto.setLastBooking(bookingDtoPast);
-                }
-                List<Booking> bookingFuture = bookingRepository.findAllItemBookingsFuture(itemDto.getId());
-                if (bookingFuture.size() != 0) {
-                    bookingFuture.sort(Comparator.comparing(Booking::getStart));
-                    BookingDto bookingDtoFuture = BookingMapper.toBookingDto(bookingFuture.get(0));
-                    bookingDtoFuture.setBookerId(bookingDtoFuture.getBooker().getId());
-                    bookingDtoFuture.setBooker(null);
-                    itemDto.setNextBooking(bookingDtoFuture);
-                }
+        List<ItemDto> itemDtoList = ItemMapper.toItemDtos(itemRepository.findAllItemsByOwner(id));
+        for (ItemDto itemDto : itemDtoList) {
+            List<Booking> bookingPast = bookingRepository.findAllItemBookingsPast(itemDto.getId());
+            if (bookingPast.size() != 0) {
+                bookingPast.sort(Comparator.comparing(Booking::getStart).reversed());
+                BookingDto bookingDtoPast = BookingMapper.toBookingDto(bookingPast.get(0));
+                bookingDtoPast.setBookerId(bookingDtoPast.getBooker().getId());
+                bookingDtoPast.setBooker(null);
+                itemDto.setLastBooking(bookingDtoPast);
             }
-            itemDtoList.sort(Comparator.comparing(ItemDto::getId));
-            return itemDtoList;
+            List<Booking> bookingFuture = bookingRepository.findAllItemBookingsFuture(itemDto.getId());
+            if (bookingFuture.size() != 0) {
+                bookingFuture.sort(Comparator.comparing(Booking::getStart));
+                BookingDto bookingDtoFuture = BookingMapper.toBookingDto(bookingFuture.get(0));
+                bookingDtoFuture.setBookerId(bookingDtoFuture.getBooker().getId());
+                bookingDtoFuture.setBooker(null);
+                itemDto.setNextBooking(bookingDtoFuture);
+            }
+        }
+        itemDtoList.sort(Comparator.comparing(ItemDto::getId));
+        return itemDtoList;
     }
-
-
-
-
 
     @Override
     public List<ItemDto> getAllItemsByString(String someText) {
@@ -174,5 +179,35 @@ public class ItemServiceImpl implements ItemService {
         } else {
             throw new ItemNotFoundException("Item not found");
         }
+    }
+
+    public CommentDto postComment(Long userId, Long itemId, CommentDto commentDto) {
+        if (commentDto.getText().isEmpty() || commentDto.getText().isBlank()) {
+            throw new InvalidParameterException("Text field is empty");
+        }
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException("User not found");
+        }
+        if (!itemRepository.existsById(itemId)) {
+            throw new ItemNotFoundException("Item not found");
+        }
+
+        List<Booking> bookings = bookingRepository.findAllItemBookings(itemId);
+        for (Booking booking : bookings) {
+            if (booking.getBooker().getId().equals(userId) && booking.getEnd().isBefore(LocalDateTime.now())) {
+                commentDto.setItem(ItemMapper.toItemDto(itemRepository.getReferenceById(itemId)));
+                commentDto.setAuthor(UserMapper.toUserDto(userRepository.getReferenceById(userId)));
+                commentDto.setCreated(LocalDateTime.now());
+                Comment commentTemp = commentRepository.save(CommentMapper.toComment(commentDto));
+                CommentDto commentTempDto = CommentMapper.toCommentDto(commentTemp);
+                commentTempDto.setAuthorName(userRepository.getReferenceById(userId).getName());
+                commentTempDto.setAuthor(null);
+                commentTempDto.setItem(null);
+                return commentTempDto;
+            } else {
+                throw new InvalidParameterException("Invalid parameter");
+            }
+        }
+        return null;
     }
 }
