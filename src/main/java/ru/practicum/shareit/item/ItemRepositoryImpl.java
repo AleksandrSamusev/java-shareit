@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
-public class ItemRepositoryImpl  implements ItemRepositoryCustom{
+public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
     private final ItemRepository itemRepository;
 
-    public ItemRepositoryImpl(@Lazy ItemRepository itemRepository){
+    public ItemRepositoryImpl(@Lazy ItemRepository itemRepository) {
         this.itemRepository = itemRepository;
     }
 

@@ -86,9 +86,9 @@ public class ItemServiceImpl implements ItemService {
         Set<CommentDto> comments = CommentMapper.toCommentDtos(commentRepository.findAllItemComments(itemId));
         for (CommentDto commentDto : comments) {
             itemDto.getComments().add(commentDto);
-           for (CommentDto commentDtoName : itemDto.getComments()) {
-               commentDtoName.setAuthorName(commentDtoName.getAuthor().getName());
-           }
+            for (CommentDto commentDtoName : itemDto.getComments()) {
+                commentDtoName.setAuthorName(commentDtoName.getAuthor().getName());
+            }
         }
 
         if (Objects.equals(itemRepository.getReferenceById(itemId).getOwner().getId(), userId)) {

@@ -37,13 +37,13 @@ public class ItemMapper {
 
     public static List<ItemDto> toItemDtos(List<Item> items) {
         List<ItemDto> tempList = new ArrayList<>();
-        for (Item item: items) {
+        for (Item item : items) {
             tempList.add(toItemDto(item));
         }
         return tempList;
     }
 
-    public static ItemDtoBooking toItemDtoBooking (Item item) {
+    public static ItemDtoBooking toItemDtoBooking(Item item) {
         ItemDtoBooking itemDtoBooking = new ItemDtoBooking();
         itemDtoBooking.setId(item.getId());
         itemDtoBooking.setName(item.getName());
@@ -54,7 +54,7 @@ public class ItemMapper {
 
     public static List<ItemDtoBooking> toItemBookingDtos(List<Item> items) {
         List<ItemDtoBooking> tempList = new ArrayList<>();
-        for (Item item: items) {
+        for (Item item : items) {
             tempList.add(toItemDtoBooking(item));
         }
         return tempList;

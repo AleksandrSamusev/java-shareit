@@ -28,39 +28,33 @@ public interface BookingRepository extends
     List<Booking> findBookingsByBookerIdWithWaitingOrRejectStatus(Long id, BookingStatus status);
 
 
-
-
-
-   @Query(value = "SELECT b FROM Booking AS b WHERE b.item.id IN (SELECT it FROM Item AS it WHERE it.owner.id = ?1) " +
-            "AND b.status  = ?2 " )
+    @Query(value = "SELECT b FROM Booking AS b WHERE b.item.id IN (SELECT it FROM Item AS it WHERE it.owner.id = ?1) " +
+            "AND b.status  = ?2 ")
     List<Booking> findAllOwnersBookingsWithStatus(Long id, BookingStatus status);
 
     @Query(value = "SELECT b FROM Booking AS b WHERE b.item.id IN (SELECT it FROM Item AS it WHERE it.owner.id = ?1) ")
     List<Booking> findAllOwnersBookings(Long id);
 
     @Query(value = "SELECT b FROM Booking AS b WHERE b.item.id IN (SELECT it FROM Item AS it WHERE it.owner.id = ?1) " +
-            "AND b.start > CURRENT_TIMESTAMP " )
+            "AND b.start > CURRENT_TIMESTAMP ")
     List<Booking> findAllOwnersBookingsWithFutureStatus(Long id);
 
     @Query(value = "SELECT b FROM Booking AS b WHERE b.item.id IN (SELECT it FROM Item AS it WHERE it.owner.id = ?1) " +
-            "AND b.start < CURRENT_TIMESTAMP AND b.end > CURRENT_TIMESTAMP " )
+            "AND b.start < CURRENT_TIMESTAMP AND b.end > CURRENT_TIMESTAMP ")
     List<Booking> findAllOwnersBookingsWithCurrentStatus(Long id);
 
     @Query(value = "SELECT b FROM Booking AS b WHERE b.item.id IN (SELECT it FROM Item AS it WHERE it.owner.id = ?1) " +
-            "AND b.end < CURRENT_TIMESTAMP " )
+            "AND b.end < CURRENT_TIMESTAMP ")
     List<Booking> findAllOwnersBookingsWithPastStatus(Long id);
 
 
-
-
-
     @Query(value = "SELECT b FROM Booking AS b WHERE b.item.id = ?1")
-    List<Booking> findAllItemBookings (Long id);
+    List<Booking> findAllItemBookings(Long id);
 
     @Query(value = "SELECT b FROM Booking AS b WHERE b.item.id = ?1 AND b.start < CURRENT_TIMESTAMP ")
-    List<Booking> findAllItemBookingsPast (Long id);
+    List<Booking> findAllItemBookingsPast(Long id);
 
     @Query(value = "SELECT b FROM Booking AS b WHERE b.item.id = ?1 AND b.start > CURRENT_TIMESTAMP ")
-    List<Booking> findAllItemBookingsFuture (Long id);
+    List<Booking> findAllItemBookingsFuture(Long id);
 }
 

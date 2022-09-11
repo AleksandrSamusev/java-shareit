@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService {
             if (userRepository.existsById(id)) {
                 return UserMapper.toUserDto(userRepository.getReferenceById(id));
             } else {
-                throw  new UserNotFoundException("User not found");
+                throw new UserNotFoundException("User not found");
             }
         } else {
             throw new UserNotFoundException("User not found");

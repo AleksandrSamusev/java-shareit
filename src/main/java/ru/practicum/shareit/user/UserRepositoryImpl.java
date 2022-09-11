@@ -7,5 +7,4 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 public class UserRepositoryImpl {
 
-
 }

@@ -20,7 +20,7 @@ public class BookingController {
 
     @PostMapping
     public BookingDto saveBooking(@RequestHeader("X-Sharer-User-Id") Long id,
-                               @RequestBody BookingSmallDto bookingSmallDto) {
+                                  @RequestBody BookingSmallDto bookingSmallDto) {
         return bookingService.create(id, bookingSmallDto);
     }
 
@@ -31,8 +31,8 @@ public class BookingController {
     }
 
     @GetMapping
-    public List<BookingDto> findAllBookingsById(@RequestParam (defaultValue = "ALL") String state,
-                                             @RequestHeader("X-Sharer-User-Id") Long id) {
+    public List<BookingDto> findAllBookingsById(@RequestParam(defaultValue = "ALL") String state,
+                                                @RequestHeader("X-Sharer-User-Id") Long id) {
 
         return bookingService.findBookingByIdAndStatus(state, id);
     }
@@ -41,12 +41,12 @@ public class BookingController {
     public BookingDto confirmOrRejectBooking(@RequestHeader("X-Sharer-User-Id") Long id,
                                              @PathVariable Long bookingId,
                                              @RequestParam Boolean approved) {
-        return bookingService.confirmOrRejectBooking(id,bookingId, approved);
+        return bookingService.confirmOrRejectBooking(id, bookingId, approved);
     }
 
     @GetMapping("/owner")
-    public List<BookingDto> findAllOwnersBookings(@RequestParam (defaultValue = "ALL") String state,
-                                            @RequestHeader("X-Sharer-User-Id") Long id) {
+    public List<BookingDto> findAllOwnersBookings(@RequestParam(defaultValue = "ALL") String state,
+                                                  @RequestHeader("X-Sharer-User-Id") Long id) {
 
         return bookingService.findAllOwnersBookings(state, id);
     }
