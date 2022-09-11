@@ -9,4 +9,4 @@ public enum BookingStatus {
     CURRENT,
     PAST,
     FUTURE
-};
+}
