@@ -183,6 +183,16 @@ public class BookingServiceImpl {
                 list.sort(Comparator.comparing(Booking::getStart).reversed());
                 return BookingMapper.toBookingDtos(list);
             }
+            if (status == BookingStatus.CURRENT) {
+                List<Booking> list = bookingRepository.findAllOwnersBookingsWithCurrentStatus(id);
+                list.sort(Comparator.comparing(Booking::getStart).reversed());
+                return BookingMapper.toBookingDtos(list);
+            }
+            if (status == BookingStatus.PAST) {
+                List<Booking> list = bookingRepository.findAllOwnersBookingsWithPastStatus(id);
+                list.sort(Comparator.comparing(Booking::getStart).reversed());
+                return BookingMapper.toBookingDtos(list);
+            }
 
             List<Booking> list = bookingRepository.findAllOwnersBookingsWithStatus(id, status);
             list.sort(Comparator.comparing(Booking::getStart).reversed());

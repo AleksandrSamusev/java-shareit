@@ -78,18 +78,21 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.findAll();
     }
 
-    public ItemDto findItemById(Long userId, Long id) {
-        if (!itemRepository.existsById(id)) {
+    public ItemDto findItemById(Long userId, Long itemId) {
+        if (!itemRepository.existsById(itemId)) {
             throw new ItemNotFoundException("Item not found");
         }
-        ItemDto itemDto = ItemMapper.toItemDto(itemRepository.getReferenceById(id));
-        Set<Comment> comments = commentRepository.findAllItemComments(id);
-        for (Comment comment : comments) {
-            itemDto.getComments().add(CommentMapper.toCommentDto(comment));
+        ItemDto itemDto = ItemMapper.toItemDto(itemRepository.getReferenceById(itemId));
+        Set<CommentDto> comments = CommentMapper.toCommentDtos(commentRepository.findAllItemComments(itemId));
+        for (CommentDto commentDto : comments) {
+            itemDto.getComments().add(commentDto);
+           for (CommentDto commentDtoName : itemDto.getComments()) {
+               commentDtoName.setAuthorName(commentDtoName.getAuthor().getName());
+           }
         }
 
-        if (Objects.equals(itemRepository.getReferenceById(id).getOwner().getId(), userId)) {
-            List<Booking> bookingPast = bookingRepository.findAllItemBookingsPast(id);
+        if (Objects.equals(itemRepository.getReferenceById(itemId).getOwner().getId(), userId)) {
+            List<Booking> bookingPast = bookingRepository.findAllItemBookingsPast(itemId);
             if (bookingPast.size() != 0) {
                 bookingPast.sort(Comparator.comparing(Booking::getStart).reversed());
                 BookingDto bookingDtoPast = BookingMapper.toBookingDto(bookingPast.get(0));
@@ -97,7 +100,7 @@ public class ItemServiceImpl implements ItemService {
                 bookingDtoPast.setBooker(null);
                 itemDto.setLastBooking(bookingDtoPast);
             }
-            List<Booking> bookingFuture = bookingRepository.findAllItemBookingsFuture(id);
+            List<Booking> bookingFuture = bookingRepository.findAllItemBookingsFuture(itemId);
             if (bookingFuture.size() != 0) {
                 bookingFuture.sort(Comparator.comparing(Booking::getStart));
                 BookingDto bookingDtoFuture = BookingMapper.toBookingDto(bookingFuture.get(0));
