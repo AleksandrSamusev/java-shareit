@@ -4,7 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
-import java.util.Objects;
+
 
 @Entity
 @Table(name = "users")
