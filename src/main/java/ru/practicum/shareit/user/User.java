@@ -4,12 +4,14 @@ import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
+import java.util.Objects;
 
 @Entity
 @Table(name = "users")
 @Getter
 @Setter
 @ToString
+@Data
 public class User {
 
     @Id
@@ -22,19 +24,8 @@ public class User {
     private String name;
 
     @Column(name = "email", nullable = false)
+
     @Email
     private String email;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof User)) return false;
-        return id != null && id.equals(((User) o).getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
 
 }
