@@ -1,6 +1,6 @@
 package ru.practicum.shareit.comment;
 
-import lombok.Data;;
+import lombok.Data;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.user.User;
 
