@@ -1,5 +1,7 @@
 package ru.practicum.shareit.item;
 
+import ru.practicum.shareit.comment.CommentDto;
+
 import java.util.List;
 
 public interface ItemService {
@@ -9,4 +11,7 @@ public interface ItemService {
 
     ItemDto patchItem(ItemDto itemDto, Long itemId, Long id);
 
+    ItemDto findItemById(Long userId, Long itemId);
+
+    CommentDto postComment(Long userId, Long itemId, CommentDto commentDto);
 }

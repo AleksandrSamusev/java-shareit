@@ -5,8 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface BookingRepository extends
-        JpaRepository<Booking, Long>, BookingRepositoryCustom {
+public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query("SELECT b FROM Booking b WHERE b.booker.id = ?1")
     List<Booking> findBookingsByBookerId(Long id);

@@ -20,9 +20,7 @@ import ru.practicum.shareit.user.UserServiceImpl;
 import java.time.LocalDateTime;
 import java.util.*;
 
-
 @Service
-
 public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
@@ -43,13 +41,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     public ItemDto createItem(Long id, ItemDto itemDto) {
-        if (itemDto.getIsAvailable() == null) {
-            throw new InvalidParameterException("Item isAvailable is empty");
-        } else if (itemDto.getName() == null || itemDto.getName().equals("")) {
-            throw new InvalidParameterException("Item name is empty");
-        } else if (itemDto.getDescription() == null || itemDto.getDescription().equals("")) {
-            throw new InvalidParameterException("Item description is empty");
-        }
+        validateItemDto(itemDto);
         itemDto.setOwner(userService.findUserById(id));
         return ItemMapper.toItemDto(itemRepository.save(ItemMapper.toItem(itemDto)));
     }
@@ -74,14 +66,8 @@ public class ItemServiceImpl implements ItemService {
         return ItemMapper.toItemDto(itemRepository.save(temp));
     }
 
-    public List<Item> getAllItems() {
-        return itemRepository.findAll();
-    }
-
     public ItemDto findItemById(Long userId, Long itemId) {
-        if (!itemRepository.existsById(itemId)) {
-            throw new ItemNotFoundException("Item not found");
-        }
+        validateItem(itemId);
         ItemDto itemDto = ItemMapper.toItemDto(itemRepository.getReferenceById(itemId));
         Set<CommentDto> comments = CommentMapper.toCommentDtos(commentRepository.findAllItemComments(itemId));
         for (CommentDto commentDto : comments) {
@@ -112,16 +98,12 @@ public class ItemServiceImpl implements ItemService {
         return itemDto;
     }
 
-    public void deleteItemById(Long id) {
-        itemRepository.deleteById(id);
-    }
-
     @Override
     public List<ItemDto> findAllItemsByOwner(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new UserNotFoundException("User not found");
-        }
+        validateUser(id);
+
         List<ItemDto> itemDtoList = ItemMapper.toItemDtos(itemRepository.findAllItemsByOwner(id));
+
         for (ItemDto itemDto : itemDtoList) {
             List<Booking> bookingPast = bookingRepository.findAllItemBookingsPast(itemDto.getId());
             if (bookingPast.size() != 0) {
@@ -167,33 +149,27 @@ public class ItemServiceImpl implements ItemService {
             }
         }
         itemDto.setId(itemId);
-        if (findItemById(id, itemDto.getId()) != null) {
-            ItemDto patchedItem = findItemById(id, itemDto.getId());
-            if (itemDto.getName() != null) {
-                patchedItem.setName(itemDto.getName());
-            }
-            if (itemDto.getDescription() != null) {
-                patchedItem.setDescription(itemDto.getDescription());
-            }
-            if (itemDto.getIsAvailable() != null) {
-                patchedItem.setIsAvailable(itemDto.getIsAvailable());
-            }
-            return patchedItem;
-        } else {
+
+        if (findItemById(id, itemDto.getId()) == null) {
             throw new ItemNotFoundException("Item not found");
         }
+        ItemDto patchedItem = findItemById(id, itemDto.getId());
+        if (itemDto.getName() != null) {
+            patchedItem.setName(itemDto.getName());
+        }
+        if (itemDto.getDescription() != null) {
+            patchedItem.setDescription(itemDto.getDescription());
+        }
+        if (itemDto.getIsAvailable() != null) {
+            patchedItem.setIsAvailable(itemDto.getIsAvailable());
+        }
+        return patchedItem;
     }
 
     public CommentDto postComment(Long userId, Long itemId, CommentDto commentDto) {
-        if (commentDto.getText().isEmpty() || commentDto.getText().isBlank()) {
-            throw new InvalidParameterException("Text field is empty");
-        }
-        if (!userRepository.existsById(userId)) {
-            throw new UserNotFoundException("User not found");
-        }
-        if (!itemRepository.existsById(itemId)) {
-            throw new ItemNotFoundException("Item not found");
-        }
+        validateComment(commentDto);
+        validateUser(userId);
+        validateItem(itemId);
 
         List<Booking> bookings = bookingRepository.findAllItemBookings(itemId);
         for (Booking booking : bookings) {
@@ -212,5 +188,33 @@ public class ItemServiceImpl implements ItemService {
             }
         }
         return null;
+    }
+
+    private void validateUser(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new UserNotFoundException("User not found");
+        }
+    }
+
+    private void validateItem(Long itemId) {
+        if (!itemRepository.existsById(itemId)) {
+            throw new ItemNotFoundException("Item not found");
+        }
+    }
+
+    private void validateItemDto(ItemDto itemDto) {
+        if (itemDto.getIsAvailable() == null) {
+            throw new InvalidParameterException("Item isAvailable is empty");
+        } else if (itemDto.getName() == null || itemDto.getName().equals("")) {
+            throw new InvalidParameterException("Item name is empty");
+        } else if (itemDto.getDescription() == null || itemDto.getDescription().equals("")) {
+            throw new InvalidParameterException("Item description is empty");
+        }
+    }
+
+    private void validateComment(CommentDto commentDto) {
+        if (commentDto.getText().isEmpty() || commentDto.getText().isBlank()) {
+            throw new InvalidParameterException("Text field is empty");
+        }
     }
 }

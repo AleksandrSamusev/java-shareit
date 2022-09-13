@@ -22,21 +22,12 @@ public class UserServiceImpl implements UserService {
     }
 
     public UserDto findUserById(Long id) {
-        if (userRepository.getReferenceById(id).getId() != null) {
-            if (userRepository.existsById(id)) {
-                return UserMapper.toUserDto(userRepository.getReferenceById(id));
-            } else {
-                throw new UserNotFoundException("User not found");
-            }
-        } else {
-            throw new UserNotFoundException("User not found");
-        }
+        validateUser(id);
+        return UserMapper.toUserDto(userRepository.getReferenceById(id));
     }
 
     public UserDto createUser(UserDto userDto) {
-        if (userDto.getEmail() == null || !userDto.getEmail().contains("@")) {
-            throw new InvalidParameterException("email is null");
-        }
+        validateEmail(userDto);
         return UserMapper.toUserDto(userRepository.save(UserMapper.toUser(userDto)));
     }
 
@@ -58,24 +49,34 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto patchUser(UserDto userDto, Long userId) {
         userDto.setId(userId);
-        if (findUserById(userDto.getId()) != null) {
-            UserDto patchedUser = findUserById(userDto.getId());
-            if (userDto.getName() != null) {
-                patchedUser.setName(userDto.getName());
-            }
-            if (userDto.getEmail() != null) {
-                for (UserDto storedUser : findAllUsers()) {
-                    if (userDto.getEmail().equals(storedUser.getEmail())) {
-                        throw new ValidationException("Email уже есть в базе");
-                    }
+        if (findUserById(userDto.getId()) == null) {
+            throw new UserNotFoundException("User not found");
+        }
+        UserDto patchedUser = findUserById(userDto.getId());
+        if (userDto.getName() != null) {
+            patchedUser.setName(userDto.getName());
+        }
+        if (userDto.getEmail() != null) {
+            for (UserDto storedUser : findAllUsers()) {
+                if (userDto.getEmail().equals(storedUser.getEmail())) {
+                    throw new ValidationException("Email уже есть в базе");
                 }
-                patchedUser.setEmail(userDto.getEmail());
             }
-            return patchedUser;
-        } else {
+            patchedUser.setEmail(userDto.getEmail());
+        }
+        return patchedUser;
+    }
+
+    private void validateUser(Long id) {
+        if (!userRepository.existsById(id)) {
             throw new UserNotFoundException("User not found");
         }
     }
 
+    private void validateEmail(UserDto userDto) {
+        if (userDto.getEmail() == null || !userDto.getEmail().contains("@")) {
+            throw new InvalidParameterException("email is null");
+        }
+    }
 
 }

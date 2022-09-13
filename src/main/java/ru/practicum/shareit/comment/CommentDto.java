@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-
 public class CommentDto {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long id;

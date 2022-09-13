@@ -4,7 +4,6 @@ import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.user.UserMapper;
 
 import java.util.HashSet;
-
 import java.util.Set;
 
 public class CommentMapper {

@@ -16,7 +16,6 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-
 public class ItemDto {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long id;

@@ -2,21 +2,13 @@ package ru.practicum.shareit.item;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 import ru.practicum.shareit.user.User;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
-
-
 @Entity
 @Table(name = "items")
-@Getter
-@Setter
-@ToString
 @Data
 public class Item {
 
