@@ -1,8 +1,15 @@
 package ru.practicum.shareit.item;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
+import ru.practicum.shareit.user.UserMapper;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ItemMapper {
 
     public static ItemDto toItemDto(Item item) {
@@ -12,8 +19,8 @@ public class ItemMapper {
         itemDto.setName(item.getName());
         itemDto.setDescription(item.getDescription());
         itemDto.setIsAvailable(item.getIsAvailable());
-        itemDto.setOwner(item.getOwner());
-        itemDto.setRequest(item.getRequest());
+        itemDto.setOwner(UserMapper.toUserDto(item.getOwner()));
+        itemDto.setRequestId(item.getRequestId());
         return itemDto;
     }
 
@@ -23,8 +30,33 @@ public class ItemMapper {
         item.setName(itemDto.getName());
         item.setDescription(itemDto.getDescription());
         item.setIsAvailable(itemDto.getIsAvailable());
-        item.setOwner(itemDto.getOwner());
-        item.setRequest(itemDto.getRequest());
+        item.setOwner(UserMapper.toUser(itemDto.getOwner()));
+        item.setRequestId(itemDto.getRequestId());
         return item;
+    }
+
+    public static List<ItemDto> toItemDtos(List<Item> items) {
+        List<ItemDto> tempList = new ArrayList<>();
+        for (Item item : items) {
+            tempList.add(toItemDto(item));
+        }
+        return tempList;
+    }
+
+    public static ItemDtoBooking toItemDtoBooking(Item item) {
+        ItemDtoBooking itemDtoBooking = new ItemDtoBooking();
+        itemDtoBooking.setId(item.getId());
+        itemDtoBooking.setName(item.getName());
+        itemDtoBooking.setDescription(item.getDescription());
+        itemDtoBooking.setIsAvailable(item.getIsAvailable());
+        return itemDtoBooking;
+    }
+
+    public static List<ItemDtoBooking> toItemBookingDtos(List<Item> items) {
+        List<ItemDtoBooking> tempList = new ArrayList<>();
+        for (Item item : items) {
+            tempList.add(toItemDtoBooking(item));
+        }
+        return tempList;
     }
 }
