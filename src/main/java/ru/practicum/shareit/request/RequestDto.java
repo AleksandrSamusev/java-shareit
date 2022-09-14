@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.UserDto;
 
 import java.time.LocalDateTime;
 
@@ -15,6 +15,6 @@ import java.time.LocalDateTime;
 public class RequestDto {
     private Long id;
     private String description;
-    private User requestor;
+    private UserDto requestor;
     private LocalDateTime created = LocalDateTime.now();
 }

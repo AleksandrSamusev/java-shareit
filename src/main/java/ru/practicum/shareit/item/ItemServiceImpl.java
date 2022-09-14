@@ -12,7 +12,9 @@ import ru.practicum.shareit.comment.CommentMapper;
 import ru.practicum.shareit.comment.CommentRepository;
 import ru.practicum.shareit.exception.InvalidParameterException;
 import ru.practicum.shareit.exception.ItemNotFoundException;
+import ru.practicum.shareit.exception.RequestNotFoundException;
 import ru.practicum.shareit.exception.UserNotFoundException;
+import ru.practicum.shareit.request.RequestRepository;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.UserServiceImpl;
@@ -28,21 +30,27 @@ public class ItemServiceImpl implements ItemService {
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
+    private final RequestRepository requestRepository;
 
     @Autowired
     public ItemServiceImpl(ItemRepository itemRepository, UserServiceImpl userService,
                            BookingRepository bookingRepository,
-                           UserRepository userRepository, CommentRepository commentRepository) {
+                           UserRepository userRepository, CommentRepository commentRepository, RequestRepository requestRepository) {
         this.itemRepository = itemRepository;
         this.userService = userService;
         this.bookingRepository = bookingRepository;
         this.userRepository = userRepository;
         this.commentRepository = commentRepository;
+        this.requestRepository = requestRepository;
     }
 
-    public ItemDto createItem(Long id, ItemDto itemDto) {
+    public ItemDto createItem(Long id, Long requestId, ItemDto itemDto) {
         validateItemDto(itemDto);
         itemDto.setOwner(userService.findUserById(id));
+        if (requestId != null) {
+            validateRequest(requestId);
+            itemDto.setRequestId(requestId);
+        }
         return ItemMapper.toItemDto(itemRepository.save(ItemMapper.toItem(itemDto)));
     }
 
@@ -215,6 +223,12 @@ public class ItemServiceImpl implements ItemService {
     private void validateComment(CommentDto commentDto) {
         if (commentDto.getText().isEmpty() || commentDto.getText().isBlank()) {
             throw new InvalidParameterException("Text field is empty");
+        }
+    }
+
+    private void validateRequest(Long requestId) {
+        if (requestRepository.existsById(requestId)) {
+            throw  new RequestNotFoundException("Request not found");
         }
     }
 }

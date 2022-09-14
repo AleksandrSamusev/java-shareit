@@ -2,6 +2,7 @@ package ru.practicum.shareit.request;
 
 
 import org.springframework.stereotype.Component;
+import ru.practicum.shareit.user.UserMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +14,7 @@ public class RequestMapper {
         Request request = new Request();
         request.setId(requestDto.getId());
         request.setDescription(requestDto.getDescription());
-        request.setRequestor(requestDto.getRequestor());
+        request.setRequestor(UserMapper.toUser(requestDto.getRequestor()));
         request.setCreated(requestDto.getCreated());
         return request;
     }
@@ -22,7 +23,7 @@ public class RequestMapper {
         RequestDto requestDto = new RequestDto();
         requestDto.setId(request.getId());
         requestDto.setDescription(request.getDescription());
-        requestDto.setRequestor(request.getRequestor());
+        requestDto.setRequestor(UserMapper.toUserDto(request.getRequestor()));
         requestDto.setCreated(request.getCreated());
         return requestDto;
     }
