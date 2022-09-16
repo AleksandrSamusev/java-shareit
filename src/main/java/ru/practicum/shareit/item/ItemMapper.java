@@ -59,4 +59,23 @@ public class ItemMapper {
         }
         return tempList;
     }
+
+    public static ItemDtoRequest toItemDtoRequest (Item item) {
+        ItemDtoRequest itemDtoRequest = new ItemDtoRequest();
+        itemDtoRequest.setId(item.getId());
+        itemDtoRequest.setName(item.getName());
+        itemDtoRequest.setDescription(item.getDescription());
+        itemDtoRequest.setIsAvailable(item.getIsAvailable());
+        itemDtoRequest.setRequestId(item.getRequestId());
+        return itemDtoRequest;
+    }
+
+    public static List<ItemDtoRequest> toItemRequestDtos(List<Item> items) {
+        List<ItemDtoRequest> tempList = new ArrayList<>();
+        for (Item item : items) {
+            tempList.add(toItemDtoRequest(item));
+        }
+        return tempList;
+    }
+
 }

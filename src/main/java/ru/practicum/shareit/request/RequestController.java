@@ -1,9 +1,9 @@
 package ru.practicum.shareit.request;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/requests")
@@ -16,8 +16,19 @@ public class RequestController {
         this.requestService = requestService;
     }
 
+    @PostMapping
     public RequestDto createRequest(@RequestHeader("X-Sharer-User-Id") Long id,
-                                    RequestDto requestDto) {
+                                    @RequestBody RequestDto requestDto) {
         return requestService.createRequest(id, requestDto);
+    }
+
+    @GetMapping
+    public List<RequestDtoResponse> findAllRequestsWithResponses (@RequestHeader("X-Sharer-User-Id") Long id) {
+        return requestService.findAllRequestsWithResponses(id);
+    }
+
+    @GetMapping("/{requestId}")
+    public List<RequestDtoResponse> findRequestWithResponses(Long requestId) {
+        
     }
 }

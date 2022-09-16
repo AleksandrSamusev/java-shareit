@@ -23,7 +23,7 @@ public class ItemController {
 
     @PostMapping
     public ItemDto createItem(@RequestHeader("X-Sharer-User-Id") Long id,
-                              @RequestParam Long requestId,
+                              @RequestParam(required = false) Long requestId,
                               @RequestBody ItemDto itemDto) {
         return itemService.createItem(id, requestId, itemDto);
     }

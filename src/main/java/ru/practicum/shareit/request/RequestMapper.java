@@ -43,4 +43,20 @@ public class RequestMapper {
         }
         return requests;
     }
+
+    public static RequestDtoResponse toRequestDtoResponse(Request request) {
+        RequestDtoResponse requestDtoResponse = new RequestDtoResponse();
+        requestDtoResponse.setId(request.getId());
+        requestDtoResponse.setCreated(request.getCreated());
+        requestDtoResponse.setDescription(request.getDescription());
+        return requestDtoResponse;
+    }
+
+    public static List<RequestDtoResponse> toRequestResponseDtos(List<Request> requests) {
+        List<RequestDtoResponse> temp = new ArrayList<>();
+        for (Request request: requests) {
+            temp.add(toRequestDtoResponse(request));
+        }
+        return temp;
+    }
 }

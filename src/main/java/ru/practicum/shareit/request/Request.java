@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Data
-@Component
+@Table(name = "requests")
 public class Request {
 
     @Id
@@ -21,7 +21,7 @@ public class Request {
     private String description;
 
     @ManyToOne
-    @Column(name = "requestor_id", nullable = false)
+    @JoinColumn(name = "requestor_id", nullable = false)
     private User requestor;
 
     @Column(name = "created", nullable = false)
