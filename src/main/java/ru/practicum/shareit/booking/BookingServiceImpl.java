@@ -1,6 +1,9 @@
 package ru.practicum.shareit.booking;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.*;
 import ru.practicum.shareit.item.ItemDto;
@@ -84,9 +87,24 @@ public class BookingServiceImpl implements BookingService {
         return BookingMapper.toBookingDto(tempBooking);
     }
 
-    public List<BookingDto> findBookingByIdAndStatus(String state, Long id) {
+    public List<BookingDto> findBookingByIdAndStatus(String state, Long id, Integer from, Integer size) {
         validateUser(id);
         validateState(state);
+
+        if (from != null && size != null) {
+            if (from < 0 || size <= 0) {
+                throw new InvalidParameterException("Invalid parameter");
+            }
+
+            Pageable pageable = PageRequest.of(from / size, size, Sort.by("start").descending());
+            BookingStatus status = BookingStatus.valueOf(state);
+            if (status == BookingStatus.ALL) {
+
+                List<Booking> list = bookingRepository.findBookingsByBookerId(id, pageable).getContent();
+
+                return BookingMapper.toBookingDtos(list);
+            }
+        }
 
         BookingStatus status = BookingStatus.valueOf(state);
 
@@ -125,13 +143,28 @@ public class BookingServiceImpl implements BookingService {
         return null;
     }
 
-    public List<BookingDto> findAllOwnersBookings(String state, Long id) {
+    public List<BookingDto> findAllOwnersBookings(String state, Long id, Integer from, Integer size) {
         validateUser(id);
         validateState(state);
 
+        if (from != null && size != null) {
+            if (from < 0 || size <= 0) {
+                throw new InvalidParameterException("Invalid parameter");
+            }
+
+            Pageable pageable = PageRequest.of(from / size, size, Sort.by("start").descending());
+
+            BookingStatus status = BookingStatus.valueOf(state);
+            if (status == BookingStatus.ALL) {
+
+                List<Booking> list = bookingRepository.findAllOwnersBookings(id, pageable).getContent();
+                return BookingMapper.toBookingDtos(list);
+            }
+        }
         BookingStatus status = BookingStatus.valueOf(state);
 
         if (status == BookingStatus.ALL) {
+
             List<Booking> list = bookingRepository.findAllOwnersBookings(id);
             list.sort(Comparator.comparing(Booking::getStart).reversed());
             return BookingMapper.toBookingDtos(list);

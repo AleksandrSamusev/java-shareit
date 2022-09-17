@@ -1,5 +1,7 @@
 package ru.practicum.shareit.booking;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -9,6 +11,12 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query("SELECT b FROM Booking b WHERE b.booker.id = ?1")
     List<Booking> findBookingsByBookerId(Long id);
+
+
+    @Query("SELECT b FROM Booking b WHERE b.booker.id = ?1")
+    Page<Booking> findBookingsByBookerId(Long id, Pageable pageable);
+
+
 
     @Query("SELECT b FROM Booking b WHERE b.booker.id = ?1 AND" +
             " b.start < CURRENT_TIMESTAMP AND b.end > CURRENT_TIMESTAMP")
@@ -33,6 +41,13 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query(value = "SELECT b FROM Booking AS b WHERE b.item.id IN (SELECT it FROM Item AS it WHERE it.owner.id = ?1) ")
     List<Booking> findAllOwnersBookings(Long id);
+
+
+
+    @Query(value = "SELECT b FROM Booking AS b WHERE b.item.id IN (SELECT it FROM Item AS it WHERE it.owner.id = ?1) ")
+    Page<Booking> findAllOwnersBookings(Long id, Pageable pageable);
+
+
 
     @Query(value = "SELECT b FROM Booking AS b WHERE b.item.id IN (SELECT it FROM Item AS it WHERE it.owner.id = ?1) " +
             "AND b.start > CURRENT_TIMESTAMP ")

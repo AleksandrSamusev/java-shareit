@@ -32,9 +32,10 @@ public class BookingController {
 
     @GetMapping
     public List<BookingDto> findAllBookingsById(@RequestParam(defaultValue = "ALL") String state,
-                                                @RequestHeader("X-Sharer-User-Id") Long id) {
-
-        return bookingService.findBookingByIdAndStatus(state, id);
+                                                @RequestHeader("X-Sharer-User-Id") Long id,
+                                                @RequestParam(required = false, defaultValue = "0") Integer from,
+                                                @RequestParam(required = false) Integer size) {
+        return bookingService.findBookingByIdAndStatus(state, id, from, size);
     }
 
     @PatchMapping("/{bookingId}")
@@ -46,9 +47,11 @@ public class BookingController {
 
     @GetMapping("/owner")
     public List<BookingDto> findAllOwnersBookings(@RequestParam(defaultValue = "ALL") String state,
-                                                  @RequestHeader("X-Sharer-User-Id") Long id) {
+                                                  @RequestHeader("X-Sharer-User-Id") Long id,
+                                                  @RequestParam(required = false) Integer from,
+                                                  @RequestParam(required = false) Integer size) {
 
-        return bookingService.findAllOwnersBookings(state, id);
+        return bookingService.findAllOwnersBookings(state, id, from, size);
     }
 
 }
