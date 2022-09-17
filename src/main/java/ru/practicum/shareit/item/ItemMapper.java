@@ -67,6 +67,8 @@ public class ItemMapper {
         itemDtoRequest.setDescription(item.getDescription());
         itemDtoRequest.setIsAvailable(item.getIsAvailable());
         itemDtoRequest.setRequestId(item.getRequestId());
+
+
         return itemDtoRequest;
     }
 

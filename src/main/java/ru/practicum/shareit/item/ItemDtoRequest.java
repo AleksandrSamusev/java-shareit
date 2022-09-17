@@ -18,4 +18,6 @@ public class ItemDtoRequest {
     @JsonProperty(value = "available")
     private Boolean isAvailable;
     private Long requestId;
+
+
 }
