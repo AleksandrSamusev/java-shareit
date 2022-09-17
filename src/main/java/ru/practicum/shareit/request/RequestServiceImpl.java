@@ -62,21 +62,17 @@ public class RequestServiceImpl implements RequestSerivice {
         return listForResponse;
     }
 
-    public List<RequestDtoResponse> findRequestWithResponses(Long userId, Long requestId) {
+    public RequestDtoResponse findRequestWithResponses(Long userId, Long requestId) {
         if (!userRepository.existsById(userId)) {
             throw new UserNotFoundException("User not found");
         }
         if (!requestRepository.existsById(requestId)) {
             throw new RequestNotFoundException("Request not found");
         }
-        List<Request> requestsFromDb = requestRepository.findRequestById(requestId);
-        List<RequestDtoResponse> listForResponse = new ArrayList<>();
-        for (Request request: requestsFromDb) {
-            RequestDtoResponse tempResponse = RequestMapper.toRequestDtoResponse(request);
-            tempResponse.setItems(ItemMapper.toItemRequestDtos(itemRepository.findAllByRequestId(requestId)));
-            listForResponse.add(tempResponse);
-        }
-        return listForResponse;
+        RequestDtoResponse response = RequestMapper.toRequestDtoResponse(requestRepository.findRequestById(requestId));
+            response.setItems(ItemMapper.toItemRequestDtos(itemRepository.findAllByRequestId(requestId)));
+            return response;
+
     }
 
     public List<RequestDtoResponse> findAllRequestsWithPagination(Long userId, Integer from, Integer size) {

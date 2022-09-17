@@ -28,7 +28,7 @@ public class RequestController {
     }
 
     @GetMapping("/{requestId}")
-    public List<RequestDtoResponse> findRequestWithResponses(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public RequestDtoResponse findRequestWithResponses(@RequestHeader("X-Sharer-User-Id") Long userId,
                                                              @PathVariable Long requestId) {
         return requestService.findRequestWithResponses(userId, requestId);
     }

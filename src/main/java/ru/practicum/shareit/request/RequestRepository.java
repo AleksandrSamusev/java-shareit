@@ -13,7 +13,7 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
     List<Request> findRequestByRequestorId(Long id);
 
     @Query("SELECT r FROM Request r WHERE r.id = ?1")
-    List<Request> findRequestById(Long id);
+    Request findRequestById(Long id);
 
     @Query("SELECT r FROM Request r WHERE r.id <> ?1")
     List<Request> findOthersRequestsWithPagination(Long id, Pageable pageable);
