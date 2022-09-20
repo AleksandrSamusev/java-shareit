@@ -17,17 +17,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class RequestServiceImpl implements RequestSerivice {
+public class RequestServiceImpl implements RequestService {
 
     private final RequestRepository requestRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
 
-    public RequestServiceImpl(RequestRepository requestRepository, UserRepository userRepository, ItemRepository itemRepository) {
+    public RequestServiceImpl(RequestRepository requestRepository, UserRepository userRepository,
+                              ItemRepository itemRepository) {
         this.requestRepository = requestRepository;
         this.userRepository = userRepository;
         this.itemRepository = itemRepository;
     }
+
 
     public RequestDto createRequest(Long id, RequestDto requestDto) {
         validateCreateRequest(id, requestDto);
@@ -36,16 +38,6 @@ public class RequestServiceImpl implements RequestSerivice {
           request.setDescription(requestDto.getDescription());
           request.setRequestor(userRepository.getReferenceById(id));
         return RequestMapper.toRequestDto(requestRepository.save(request));
-    }
-
-    private void validateCreateRequest(Long id, RequestDto requestDto) {
-        if (id == null || !userRepository.existsById(id)) {
-            throw new UserNotFoundException("User not found");
-        }
-        if (requestDto.getDescription() == null || requestDto.getDescription().isBlank()
-                || requestDto.getDescription().isEmpty()) {
-            throw new InvalidParameterException("Description field is empty");
-        }
     }
 
     public List<RequestDtoResponse> findAllRequestsWithResponses(Long id) {
@@ -101,5 +93,15 @@ public class RequestServiceImpl implements RequestSerivice {
             return listForResponse;
         }
         return findAllRequestsWithResponses(userId);
+    }
+
+    private void validateCreateRequest(Long id, RequestDto requestDto) {
+        if (id == null || !userRepository.existsById(id)) {
+            throw new UserNotFoundException("User not found");
+        }
+        if (requestDto.getDescription() == null || requestDto.getDescription().isBlank()
+                || requestDto.getDescription().isEmpty()) {
+            throw new InvalidParameterException("Description field is empty");
+        }
     }
 }
