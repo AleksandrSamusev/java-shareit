@@ -227,7 +227,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private void validateRequest(Long requestId) {
-        if (requestRepository.existsById(requestId)) {
+        if (!requestRepository.existsById(requestId)) {
             throw  new RequestNotFoundException("Request not found");
         }
     }
