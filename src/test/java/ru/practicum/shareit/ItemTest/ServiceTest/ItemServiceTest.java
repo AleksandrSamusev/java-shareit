@@ -1,11 +1,17 @@
 package ru.practicum.shareit.ItemTest.ServiceTest;
 
 import lombok.RequiredArgsConstructor;
+import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
+import ru.practicum.shareit.booking.BookingDto;
+import ru.practicum.shareit.booking.BookingService;
+import ru.practicum.shareit.booking.BookingStatus;
+import ru.practicum.shareit.comment.CommentDto;
 import ru.practicum.shareit.exception.InvalidParameterException;
+import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.exception.RequestNotFoundException;
 import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.item.Item;
@@ -44,9 +50,10 @@ public class ItemServiceTest<T extends ItemService> {
     private final RequestService requestService;
     private final UserService userService;
     private final ItemService itemService;
+    private final BookingService bookingService;
 
     @Test
-    public void createItemWithoutRequest() {
+    public void createItemWithoutRequestTest() {
 
         User user = new User();
         user.setName("user");
@@ -70,7 +77,7 @@ public class ItemServiceTest<T extends ItemService> {
     }
 
     @Test
-    public void createItemWithoutRequestWithBadItemName() {
+    public void createItemWithoutRequestWithBadItemNameTest() {
         User user = new User();
         user.setName("user");
         user.setEmail("user@user.ru");
@@ -82,12 +89,12 @@ public class ItemServiceTest<T extends ItemService> {
         item.setDescription("This is the best screwdriver in the world!");
 
         assertThrows(InvalidParameterException.class,
-                ()->itemService.createItem(1L, null, ItemMapper.toItemDto(item)));
+                () -> itemService.createItem(1L, null, ItemMapper.toItemDto(item)));
 
     }
 
     @Test
-    public void createItemWithoutRequestWithBadItemDescription() {
+    public void createItemWithoutRequestWithBadItemDescriptionTest() {
         User user = new User();
         user.setName("user");
         user.setEmail("user@user.ru");
@@ -99,12 +106,12 @@ public class ItemServiceTest<T extends ItemService> {
         item.setOwner(user);
 
         assertThrows(InvalidParameterException.class,
-                ()->itemService.createItem(1L, null, ItemMapper.toItemDto(item)));
+                () -> itemService.createItem(1L, null, ItemMapper.toItemDto(item)));
 
     }
 
     @Test
-    public void createItemWithoutRequestWithBadItemIsAvailableParameter() {
+    public void createItemWithoutRequestWithBadItemIsAvailableParameterTest() {
         User user = new User();
         user.setName("user");
         user.setEmail("user@user.ru");
@@ -116,12 +123,12 @@ public class ItemServiceTest<T extends ItemService> {
         item.setDescription("This is the best screwdriver in the world!");
 
         assertThrows(InvalidParameterException.class,
-                ()->itemService.createItem(1L, null, ItemMapper.toItemDto(item)));
+                () -> itemService.createItem(1L, null, ItemMapper.toItemDto(item)));
 
     }
 
     @Test
-    public void createItemWithRequest() {
+    public void createItemWithRequestTest() {
 
         User user = new User();
         user.setName("user");
@@ -149,15 +156,16 @@ public class ItemServiceTest<T extends ItemService> {
         assertThat(itemFromDb.getName(), equalTo(item.getName()));
         assertThat(itemFromDb.getDescription(), equalTo(item.getDescription()));
         assertThrows(RequestNotFoundException.class,
-                ()->itemService.createItem(1L, 999L, ItemMapper.toItemDto(item)));
+                () -> itemService.createItem(1L, 999L, ItemMapper.toItemDto(item)));
     }
 
     @Test
-    public void updateItem() {
+    public void updateItemTest() {
         UserDto user = new UserDto();
         user.setName("user");
         user.setEmail("user@user.ru");
         userService.createUser(user);
+
 
         ItemDto item = new ItemDto();
         item.setIsAvailable(true);
@@ -183,5 +191,116 @@ public class ItemServiceTest<T extends ItemService> {
         assertThat(itemFromDb.getRequestId(), equalTo(null));
     }
 
+    @Test
+    public void findItemByIdTest() {
+        UserDto user = new UserDto();
+        user.setName("user");
+        user.setEmail("user@user.ru");
+        userService.createUser(user);
+
+        UserDto user2 = new UserDto();
+        user2.setName("user2");
+        user2.setEmail("user2@user.ru");
+        userService.createUser(user2);
+
+        ItemDto item = new ItemDto();
+        item.setIsAvailable(true);
+        item.setName("Screwdriver");
+        item.setOwner(user);
+        item.setDescription("This is the best screwdriver in the world!");
+        itemService.createItem(1L, null, item);
+
+        ItemDto itemResponce = itemService.findItemById(1L, 1L);
+
+        assertThat(itemResponce.getId(), notNullValue());
+        assertThat(itemResponce.getName(), equalTo("Screwdriver"));
+        assertThat(itemResponce.getOwner().getName(), equalTo(user.getName()));
     }
+
+    @Test
+    public void findAllItemsByOwnerTest() {
+        UserDto user = new UserDto();
+        user.setName("user");
+        user.setEmail("user@user.ru");
+        userService.createUser(user);
+
+        ItemDto item = new ItemDto();
+        item.setIsAvailable(true);
+        item.setName("Screwdriver");
+        item.setOwner(user);
+        item.setDescription("This is the best screwdriver in the world!");
+        itemService.createItem(1L, null, item);
+
+        ItemDto item2 = new ItemDto();
+        item2.setIsAvailable(true);
+        item2.setName("Wrench");
+        item2.setOwner(user);
+        item2.setDescription("Super wrench!");
+        itemService.createItem(1L, null, item2);
+
+        List<ItemDto> listOfItems = itemService.findAllItemsByOwner(1L);
+
+        assertThat(listOfItems.size(), equalTo(2));
+        assertThat(listOfItems.get(0).getId(), equalTo(1L));
+        assertThat(listOfItems.get(1).getId(), equalTo(2L));
+
+    }
+
+    @Test
+    public void getAllItemsByStringTest() {
+        UserDto user = new UserDto();
+        user.setName("user");
+        user.setEmail("user@user.ru");
+        userService.createUser(user);
+
+        ItemDto item = new ItemDto();
+        item.setIsAvailable(true);
+        item.setName("Screwdriver");
+        item.setOwner(user);
+        item.setDescription("This is the best screwdriver in the world!");
+        itemService.createItem(1L, null, item);
+
+        ItemDto item2 = new ItemDto();
+        item2.setIsAvailable(true);
+        item2.setName("Wrench");
+        item2.setOwner(user);
+        item2.setDescription("Super wrench!");
+        itemService.createItem(1L, null, item2);
+
+        List<ItemDto> listOfItemsByDescription = itemService.getAllItemsByString("best");
+        assertThat(listOfItemsByDescription.size(), equalTo(1));
+        assertThat(listOfItemsByDescription.get(0).getName(), equalTo("Screwdriver"));
+
+        List<ItemDto> listOfItemsByName = itemService.getAllItemsByString("Wrench");
+        assertThat(listOfItemsByName.size(), equalTo(1));
+        assertThat(listOfItemsByName.get(0).getName(), equalTo("Wrench"));
+    }
+
+    @Test
+    public void patchItemTest() {
+        UserDto user = new UserDto();
+        user.setName("user");
+        user.setEmail("user@user.ru");
+        userService.createUser(user);
+
+        ItemDto item = new ItemDto();
+        item.setIsAvailable(true);
+        item.setName("Screwdriver");
+        item.setOwner(user);
+        item.setDescription("This is the best screwdriver in the world!");
+        itemService.createItem(1L, null, item);
+
+
+        ItemDto patchedItem = new ItemDto();
+        patchedItem.setId(1L);
+        patchedItem.setIsAvailable(true);
+        patchedItem.setName("Bad screwdriver");
+        patchedItem.setOwner(user);
+        patchedItem.setDescription("Baaad!");
+
+        ItemDto testItem = itemService.patchItem(patchedItem, 1L, 1L);
+        assertThat(patchedItem.getName(), equalTo(testItem.getName()));
+        assertThat(patchedItem.getDescription(), equalTo(testItem.getDescription()));
+    }
+}
 
