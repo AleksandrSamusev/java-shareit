@@ -45,9 +45,4 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage());
     }
 
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleDuplicateParameterException(final DuplicateParameterException e) {
-        return new ErrorResponse(e.getMessage());
-    }
 }

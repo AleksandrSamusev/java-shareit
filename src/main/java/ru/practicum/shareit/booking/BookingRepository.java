@@ -17,7 +17,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     Page<Booking> findBookingsByBookerId(Long id, Pageable pageable);
 
 
-
     @Query("SELECT b FROM Booking b WHERE b.booker.id = ?1 AND" +
             " b.start < CURRENT_TIMESTAMP AND b.end > CURRENT_TIMESTAMP")
     List<Booking> findBookingsByBookerIdWithCurrentStatus(Long id);
@@ -43,10 +42,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findAllOwnersBookings(Long id);
 
 
-
     @Query(value = "SELECT b FROM Booking AS b WHERE b.item.id IN (SELECT it FROM Item AS it WHERE it.owner.id = ?1) ")
     Page<Booking> findAllOwnersBookings(Long id, Pageable pageable);
-
 
 
     @Query(value = "SELECT b FROM Booking AS b WHERE b.item.id IN (SELECT it FROM Item AS it WHERE it.owner.id = ?1) " +

@@ -34,9 +34,9 @@ public class RequestServiceImpl implements RequestService {
     public RequestDto createRequest(Long id, RequestDto requestDto) {
         validateCreateRequest(id, requestDto);
         Request request = new Request();
-          request.setCreated(LocalDateTime.now());
-          request.setDescription(requestDto.getDescription());
-          request.setRequestor(userRepository.getReferenceById(id));
+        request.setCreated(LocalDateTime.now());
+        request.setDescription(requestDto.getDescription());
+        request.setRequestor(userRepository.getReferenceById(id));
         return RequestMapper.toRequestDto(requestRepository.save(request));
     }
 
@@ -46,7 +46,7 @@ public class RequestServiceImpl implements RequestService {
         }
         List<Request> requestsFromDb = requestRepository.findRequestByRequestorId(id);
         List<RequestDtoResponse> listForResponse = new ArrayList<>();
-        for (Request request: requestsFromDb) {
+        for (Request request : requestsFromDb) {
             RequestDtoResponse tempResponse = RequestMapper.toRequestDtoResponse(request);
             tempResponse.setItems(ItemMapper.toItemRequestDtos(itemRepository.findAllByRequestId(request.getId())));
             listForResponse.add(tempResponse);
@@ -62,8 +62,8 @@ public class RequestServiceImpl implements RequestService {
             throw new RequestNotFoundException("Request not found");
         }
         RequestDtoResponse response = RequestMapper.toRequestDtoResponse(requestRepository.findRequestById(requestId));
-            response.setItems(ItemMapper.toItemRequestDtos(itemRepository.findAllByRequestId(requestId)));
-            return response;
+        response.setItems(ItemMapper.toItemRequestDtos(itemRepository.findAllByRequestId(requestId)));
+        return response;
 
     }
 

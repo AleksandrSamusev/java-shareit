@@ -44,7 +44,6 @@ public class ItemMapper {
     }
 
 
-
     public static ItemDtoRequest toItemDtoRequest(Item item) {
         ItemDtoRequest itemDtoRequest = new ItemDtoRequest();
         itemDtoRequest.setId(item.getId());

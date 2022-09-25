@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
-import ru.practicum.shareit.booking.BookingService;
 import ru.practicum.shareit.exception.InvalidParameterException;
+import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.exception.RequestNotFoundException;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.ItemDto;
@@ -43,7 +43,6 @@ public class ItemServiceTest<T extends ItemService> {
     private final RequestService requestService;
     private final UserService userService;
     private final ItemService itemService;
-    private final BookingService bookingService;
 
     @Test
     public void createItemWithoutRequestTest() {
@@ -208,6 +207,9 @@ public class ItemServiceTest<T extends ItemService> {
         assertThat(itemResponce.getId(), notNullValue());
         assertThat(itemResponce.getName(), equalTo("Screwdriver"));
         assertThat(itemResponce.getOwner().getName(), equalTo(user.getName()));
+        var ex = assertThrows(ItemNotFoundException.class,
+                () -> itemService.findItemById(1L, 99L));
+        assertThat(ex.getMessage(), equalTo("Item not found"));
     }
 
     @Test
@@ -236,6 +238,7 @@ public class ItemServiceTest<T extends ItemService> {
         assertThat(listOfItems.size(), equalTo(2));
         assertThat(listOfItems.get(0).getId(), equalTo(1L));
         assertThat(listOfItems.get(1).getId(), equalTo(2L));
+
 
     }
 
@@ -294,6 +297,27 @@ public class ItemServiceTest<T extends ItemService> {
         ItemDto testItem = itemService.patchItem(patchedItem, 1L, 1L);
         assertThat(patchedItem.getName(), equalTo(testItem.getName()));
         assertThat(patchedItem.getDescription(), equalTo(testItem.getDescription()));
+    }
+
+    @Test
+    public void createCommentTest() {
+        UserDto user = new UserDto();
+        user.setName("user");
+        user.setEmail("user@user.ru");
+        userService.createUser(user);
+
+        UserDto user2 = new UserDto();
+        user2.setName("user2");
+        user2.setEmail("user2@user.ru");
+        userService.createUser(user2);
+
+        ItemDto item = new ItemDto();
+        item.setIsAvailable(true);
+        item.setName("Screwdriver");
+        item.setOwner(user);
+        item.setDescription("This is the best screwdriver in the world!");
+        itemService.createItem(1L, null, item);
+
     }
 }
 

@@ -15,6 +15,7 @@ import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserService;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.util.List;
 
@@ -34,10 +35,33 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class UserServiceTest<T extends UserService> {
 
     private final EntityManager em;
-    private final RequestService requestService;
     private final UserService userService;
-    private final ItemService itemService;
-    private final BookingService bookingService;
+
+    @Test
+    public void createUserTest() {
+        User user = new User();
+        user.setName("user");
+        user.setEmail("user@user.ru");
+        userService.createUser(UserMapper.toUserDto(user));
+
+        TypedQuery<User> query = em.createQuery("SELECT u FROM User u WHERE u.name = :name", User.class);
+
+        User dbUser = query.setParameter("name", user.getName()).getSingleResult();
+
+        assertThat(dbUser.getEmail(), equalTo("user@user.ru"));
+    }
+
+    @Test
+    public void createUserWithBadEmailTest() {
+        User user = new User();
+        user.setName("user");
+        user.setEmail("user.ru");
+
+        var ex = assertThrows(InvalidParameterException.class,
+                () -> userService.createUser(UserMapper.toUserDto(user)));
+
+        assertThat(ex.getMessage(), equalTo("email is null"));
+    }
 
     @Test
     public void findAllUsersTest() {
