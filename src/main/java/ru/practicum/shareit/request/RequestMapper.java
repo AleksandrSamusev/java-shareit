@@ -4,9 +4,6 @@ package ru.practicum.shareit.request;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.user.UserMapper;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Component
 public class RequestMapper {
 

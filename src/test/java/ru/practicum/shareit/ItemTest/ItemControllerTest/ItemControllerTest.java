@@ -1,9 +1,7 @@
 package ru.practicum.shareit.ItemTest.ItemControllerTest;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -82,7 +80,7 @@ public class ItemControllerTest {
         Mockito.when(itemService.findItemById(anyLong(), anyLong())).thenReturn(item);
 
         mvc.perform(get("/items/1")
-                .header("X-Sharer-User-Id", "1"))
+                        .header("X-Sharer-User-Id", "1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.name").value("Wrench"));

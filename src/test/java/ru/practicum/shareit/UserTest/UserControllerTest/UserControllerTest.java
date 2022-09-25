@@ -12,6 +12,7 @@ import ru.practicum.shareit.user.*;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
