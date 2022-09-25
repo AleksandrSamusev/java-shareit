@@ -24,36 +24,6 @@ public class BookingMapper {
         return bookingDto;
     }
 
-    public static Booking toBooking(BookingDto bookingDto) {
-        Booking booking = new Booking();
-        booking.setId(bookingDto.getId());
-        booking.setStart(bookingDto.getStart());
-        booking.setEnd(bookingDto.getEnd());
-        booking.setStatus(bookingDto.getStatus());
-        booking.setBooker(UserMapper.toUser(bookingDto.getBooker()));
-        booking.setItem(ItemMapper.toItem(bookingDto.getItem()));
-        return booking;
-    }
-
-    public static BookingSmallDto toBookingSmallDto(Booking booking) {
-        BookingSmallDto bookingSmallDto = new BookingSmallDto();
-
-        bookingSmallDto.setId(booking.getId());
-        bookingSmallDto.setStart(booking.getStart());
-        bookingSmallDto.setEnd(booking.getEnd());
-        bookingSmallDto.setItemId(booking.getItem().getId());
-
-        return bookingSmallDto;
-    }
-
-    public static Booking toBookingFromSmallDto(BookingSmallDto bookingSmallDto) {
-        Booking booking = new Booking();
-        booking.setId(bookingSmallDto.getId());
-        booking.setStart(bookingSmallDto.getStart());
-        booking.setEnd(bookingSmallDto.getEnd());
-        return booking;
-    }
-
     public static List<BookingDto> toBookingDtos(List<Booking> bookings) {
         List<BookingDto> dtos = new ArrayList<>();
         for (Booking booking : bookings) {

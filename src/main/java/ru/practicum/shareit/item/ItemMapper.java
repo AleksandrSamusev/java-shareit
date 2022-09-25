@@ -43,22 +43,7 @@ public class ItemMapper {
         return tempList;
     }
 
-    public static ItemDtoBooking toItemDtoBooking(Item item) {
-        ItemDtoBooking itemDtoBooking = new ItemDtoBooking();
-        itemDtoBooking.setId(item.getId());
-        itemDtoBooking.setName(item.getName());
-        itemDtoBooking.setDescription(item.getDescription());
-        itemDtoBooking.setIsAvailable(item.getIsAvailable());
-        return itemDtoBooking;
-    }
 
-    public static List<ItemDtoBooking> toItemBookingDtos(List<Item> items) {
-        List<ItemDtoBooking> tempList = new ArrayList<>();
-        for (Item item : items) {
-            tempList.add(toItemDtoBooking(item));
-        }
-        return tempList;
-    }
 
     public static ItemDtoRequest toItemDtoRequest(Item item) {
         ItemDtoRequest itemDtoRequest = new ItemDtoRequest();
