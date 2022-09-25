@@ -60,7 +60,7 @@ public class ItemMapper {
         return tempList;
     }
 
-    public static ItemDtoRequest toItemDtoRequest (Item item) {
+    public static ItemDtoRequest toItemDtoRequest(Item item) {
         ItemDtoRequest itemDtoRequest = new ItemDtoRequest();
         itemDtoRequest.setId(item.getId());
         itemDtoRequest.setName(item.getName());

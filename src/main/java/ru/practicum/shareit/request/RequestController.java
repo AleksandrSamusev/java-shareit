@@ -23,13 +23,13 @@ public class RequestController {
     }
 
     @GetMapping
-    public List<RequestDtoResponse> findAllRequestsWithResponses (@RequestHeader("X-Sharer-User-Id") Long id) {
+    public List<RequestDtoResponse> findAllRequestsWithResponses(@RequestHeader("X-Sharer-User-Id") Long id) {
         return requestService.findAllRequestsWithResponses(id);
     }
 
     @GetMapping("/{requestId}")
     public RequestDtoResponse findRequestWithResponses(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                             @PathVariable Long requestId) {
+                                                       @PathVariable Long requestId) {
         return requestService.findRequestWithResponses(userId, requestId);
     }
 
