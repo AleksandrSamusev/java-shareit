@@ -1,19 +1,13 @@
 package ru.practicum.shareit.ItemTest.ServiceTest;
 
 import lombok.RequiredArgsConstructor;
-import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
-import ru.practicum.shareit.booking.BookingDto;
 import ru.practicum.shareit.booking.BookingService;
-import ru.practicum.shareit.booking.BookingStatus;
-import ru.practicum.shareit.comment.CommentDto;
 import ru.practicum.shareit.exception.InvalidParameterException;
-import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.exception.RequestNotFoundException;
-import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.ItemDto;
 import ru.practicum.shareit.item.ItemMapper;
@@ -34,7 +28,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
 
 @Transactional
 @SpringBootTest(

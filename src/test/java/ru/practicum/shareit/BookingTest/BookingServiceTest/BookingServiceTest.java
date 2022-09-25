@@ -1,20 +1,17 @@
 package ru.practicum.shareit.BookingTest.BookingServiceTest;
+
 import lombok.RequiredArgsConstructor;
-import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import ru.practicum.shareit.booking.*;
-import ru.practicum.shareit.comment.CommentDto;
 import ru.practicum.shareit.exception.*;
 import ru.practicum.shareit.item.Item;
-import ru.practicum.shareit.item.ItemDto;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.request.*;
 import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.user.UserDto;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserService;
 
@@ -26,7 +23,6 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
@@ -41,7 +37,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class BookingServiceTest<T extends BookingService> {
 
     private final EntityManager em;
-    private final RequestService requestService;
     private final UserService userService;
     private final ItemService itemService;
     private final BookingService bookingService;
@@ -67,8 +62,8 @@ public class BookingServiceTest<T extends BookingService> {
         itemService.createItem(1L, null, ItemMapper.toItemDto(item));
 
         BookingSmallDto dto = new BookingSmallDto();
-        dto.setStart(LocalDateTime.of(2023,12,31,12,30));
-        dto.setEnd(LocalDateTime.of(2024,12,31,12,30));
+        dto.setStart(LocalDateTime.of(2023, 12, 31, 12, 30));
+        dto.setEnd(LocalDateTime.of(2024, 12, 31, 12, 30));
         dto.setItemId(1L);
 
         bookingService.create(2L, dto);
@@ -101,8 +96,8 @@ public class BookingServiceTest<T extends BookingService> {
         itemService.createItem(1L, null, ItemMapper.toItemDto(item));
 
         BookingSmallDto dto = new BookingSmallDto();
-        dto.setStart(LocalDateTime.of(2023,12,31,12,30));
-        dto.setEnd(LocalDateTime.of(2024,12,31,12,30));
+        dto.setStart(LocalDateTime.of(2023, 12, 31, 12, 30));
+        dto.setEnd(LocalDateTime.of(2024, 12, 31, 12, 30));
         dto.setItemId(1L);
         bookingService.create(2L, dto);
 
@@ -132,8 +127,8 @@ public class BookingServiceTest<T extends BookingService> {
         itemService.createItem(1L, null, ItemMapper.toItemDto(item));
 
         BookingSmallDto dto = new BookingSmallDto();
-        dto.setStart(LocalDateTime.of(2023,12,31,12,30));
-        dto.setEnd(LocalDateTime.of(2024,12,31,12,30));
+        dto.setStart(LocalDateTime.of(2023, 12, 31, 12, 30));
+        dto.setEnd(LocalDateTime.of(2024, 12, 31, 12, 30));
         dto.setItemId(1L);
 
         bookingService.create(2L, dto);
@@ -173,8 +168,8 @@ public class BookingServiceTest<T extends BookingService> {
         itemService.createItem(1L, null, ItemMapper.toItemDto(item));
 
         BookingSmallDto dto = new BookingSmallDto();
-        dto.setStart(LocalDateTime.of(2023,12,31,12,30));
-        dto.setEnd(LocalDateTime.of(2024,12,31,12,30));
+        dto.setStart(LocalDateTime.of(2023, 12, 31, 12, 30));
+        dto.setEnd(LocalDateTime.of(2024, 12, 31, 12, 30));
         dto.setItemId(1L);
 
         bookingService.create(2L, dto);
@@ -184,7 +179,7 @@ public class BookingServiceTest<T extends BookingService> {
         assertThrows(InvalidParameterException.class,
                 () -> bookingService.findBookingByIdAndStatus("WAITING", 1L, 0, -1));
 
-        List<BookingDto> list =  bookingService.findBookingByIdAndStatus("ALL", 2L, 0, 1);
+        List<BookingDto> list = bookingService.findBookingByIdAndStatus("ALL", 2L, 0, 1);
         assertThat(list.size(), equalTo(1));
 
         list = bookingService.findBookingByIdAndStatus("FUTURE", 2L, 0, 1);
@@ -223,8 +218,8 @@ public class BookingServiceTest<T extends BookingService> {
         itemService.createItem(1L, null, ItemMapper.toItemDto(item));
 
         BookingSmallDto dto = new BookingSmallDto();
-        dto.setStart(LocalDateTime.of(2023,12,31,12,30));
-        dto.setEnd(LocalDateTime.of(2024,12,31,12,30));
+        dto.setStart(LocalDateTime.of(2023, 12, 31, 12, 30));
+        dto.setEnd(LocalDateTime.of(2024, 12, 31, 12, 30));
         dto.setItemId(1L);
 
         bookingService.create(2L, dto);
@@ -234,16 +229,16 @@ public class BookingServiceTest<T extends BookingService> {
         assertThrows(InvalidParameterException.class,
                 () -> bookingService.findAllOwnersBookings("WAITING", 1L, 0, -1));
 
-        List<BookingDto> list =  bookingService.findAllOwnersBookings("ALL", 1L, 0, 1);
+        List<BookingDto> list = bookingService.findAllOwnersBookings("ALL", 1L, 0, 1);
         assertThat(list.size(), equalTo(1));
 
-        list =  bookingService.findAllOwnersBookings("FUTURE", 1L, 0, 1);
+        list = bookingService.findAllOwnersBookings("FUTURE", 1L, 0, 1);
         assertThat(list.size(), equalTo(1));
 
-        list =  bookingService.findAllOwnersBookings("CURRENT", 1L, 0, 1);
+        list = bookingService.findAllOwnersBookings("CURRENT", 1L, 0, 1);
         assertThat(list.size(), equalTo(0));
 
-        list =  bookingService.findAllOwnersBookings("PAST", 1L, 0, 1);
+        list = bookingService.findAllOwnersBookings("PAST", 1L, 0, 1);
         assertThat(list.size(), equalTo(0));
 
         assertThrows(ValidationException.class,

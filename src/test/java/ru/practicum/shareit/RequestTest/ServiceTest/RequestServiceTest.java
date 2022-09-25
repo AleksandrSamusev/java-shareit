@@ -78,7 +78,7 @@ public class RequestServiceTest<T extends RequestService> {
 
 
         assertThrows(InvalidParameterException.class,
-                ()->requestService.createRequest(1L, new RequestDto()));
+                () -> requestService.createRequest(1L, new RequestDto()));
     }
 
     @Test
@@ -95,7 +95,7 @@ public class RequestServiceTest<T extends RequestService> {
         requestService.createRequest(1L, dto);
 
         assertThrows(UserNotFoundException.class,
-                ()->requestService.createRequest(999L , dto));
+                () -> requestService.createRequest(999L, dto));
 
     }
 
@@ -133,7 +133,7 @@ public class RequestServiceTest<T extends RequestService> {
 
         assertThat(responce.size(), equalTo(1));
         assertThrows(UserNotFoundException.class,
-                ()->requestService.findAllRequestsWithResponses(-1L));
+                () -> requestService.findAllRequestsWithResponses(-1L));
 
     }
 
@@ -169,9 +169,9 @@ public class RequestServiceTest<T extends RequestService> {
 
         assertThat(responce.getItems().get(0).getName(), equalTo("Screwdriver"));
         assertThrows(UserNotFoundException.class,
-                ()->requestService.findRequestWithResponses(-1L, 1L));
+                () -> requestService.findRequestWithResponses(-1L, 1L));
         assertThrows(RequestNotFoundException.class,
-                ()->requestService.findRequestWithResponses(2L, -1L));
+                () -> requestService.findRequestWithResponses(2L, -1L));
     }
 
 
@@ -190,11 +190,11 @@ public class RequestServiceTest<T extends RequestService> {
         requestService.createRequest(1L, RequestMapper.toRequestDto(request));
 
         assertThrows(UserNotFoundException.class,
-                ()->requestService.findAllRequestsWithPagination(999L, 1, 1));
+                () -> requestService.findAllRequestsWithPagination(999L, 1, 1));
         assertThrows(InvalidParameterException.class,
-                ()->requestService.findAllRequestsWithPagination(1L, -999, 1));
+                () -> requestService.findAllRequestsWithPagination(1L, -999, 1));
         assertThrows(InvalidParameterException.class,
-                ()->requestService.findAllRequestsWithPagination(1L, 1, -999));
+                () -> requestService.findAllRequestsWithPagination(1L, 1, -999));
 
     }
 
