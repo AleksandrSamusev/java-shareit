@@ -32,11 +32,12 @@ public class ItemControllerTest {
     @MockBean
     ItemServiceImpl itemService;
 
+    @Autowired
+    private MockMvc mvc;
+
     @MockBean
     UserServiceImpl userService;
 
-    @Autowired
-    private MockMvc mvc;
 
     @Test
     public void createNewItemTest() throws Exception {
