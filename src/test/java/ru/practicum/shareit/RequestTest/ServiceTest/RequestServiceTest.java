@@ -21,6 +21,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -195,6 +196,10 @@ public class RequestServiceTest<T extends RequestService> {
                 () -> requestService.findAllRequestsWithPagination(1L, -999, 1));
         assertThrows(InvalidParameterException.class,
                 () -> requestService.findAllRequestsWithPagination(1L, 1, -999));
+
+        List<RequestDtoResponse> responce = requestService
+                .findAllRequestsWithPagination(1L, 0, 2);
+        assertThat(responce, equalTo(new ArrayList<>()));
 
     }
 

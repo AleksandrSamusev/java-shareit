@@ -8,7 +8,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.practicum.shareit.user.*;
+import ru.practicum.shareit.exception.UserNotFoundException;
+import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.user.UserController;
+import ru.practicum.shareit.user.UserDto;
+import ru.practicum.shareit.user.UserServiceImpl;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -46,9 +50,24 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.name").value("John"))
                 .andExpect(jsonPath("$.email").value("john@joseph.com"));
+    }
 
+    @Test
+    void saveIncorrectUser() throws Exception {
+        userDto.setEmail("useruser.ru");
+
+        when(userService.createUser(userDto))
+                .thenThrow(ValidationException.class);
+
+        mvc.perform(post("/users")
+                        .content(mapper.writeValueAsString(userDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError());
 
     }
+
 
     @Test
     void updateUser() throws Exception {
@@ -102,6 +121,16 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.name").value("adam"));
 
     }
+
+    @Test
+    void getIncorrectUserById() throws Exception {
+
+        Mockito.when(userService.findUserById(Mockito.any())).thenThrow(UserNotFoundException.class);
+
+        mvc.perform(get("/users/1"))
+                .andExpect(status().isNotFound());
+    }
+
 
     @Test
     public void deleteUserByIdTest() throws Exception {

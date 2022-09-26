@@ -25,8 +25,9 @@ import java.util.*;
 @Service
 public class ItemServiceImpl implements ItemService {
 
-    private final ItemRepository itemRepository;
     private final UserServiceImpl userService;
+    private final ItemRepository itemRepository;
+
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;

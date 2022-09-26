@@ -11,6 +11,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import ru.practicum.shareit.comment.CommentDto;
 import ru.practicum.shareit.exception.InvalidParameterException;
+import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.item.ItemController;
 import ru.practicum.shareit.item.ItemDto;
 import ru.practicum.shareit.item.ItemServiceImpl;
@@ -106,6 +107,18 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.name").value("Wrench"));
 
     }
+
+    @Test
+    public void getWrongItemByIdTest() throws Exception {
+
+        Mockito.when(itemService.findItemById(anyLong(), anyLong())).thenThrow(ItemNotFoundException.class);
+
+        mvc.perform(get("/items/1")
+                        .header("X-Sharer-User-Id", "1"))
+                .andExpect(status().isNotFound());
+
+    }
+
 
     @Test
     public void findItemByOwner() throws Exception {

@@ -8,9 +8,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.practicum.shareit.booking.*;
+import ru.practicum.shareit.booking.BookingController;
+import ru.practicum.shareit.booking.BookingDto;
+import ru.practicum.shareit.booking.BookingServiceImpl;
+import ru.practicum.shareit.booking.BookingStatus;
+import ru.practicum.shareit.exception.BookingNotFoundException;
 import ru.practicum.shareit.item.ItemDto;
-import ru.practicum.shareit.user.*;
+import ru.practicum.shareit.user.UserDto;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -20,7 +24,8 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = BookingController.class)
 public class BookingControllerTest {
@@ -78,6 +83,16 @@ public class BookingControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L));
 
+    }
+
+    @Test
+    public void testFindBookingWithBadId() throws Exception {
+        when(bookingService.findBookingById(anyLong(), anyLong()))
+                .thenThrow(BookingNotFoundException.class);
+
+        mvc.perform(get("/bookings/1")
+                        .header("X-Sharer-User-Id", "1"))
+                .andExpect(status().isNotFound());
     }
 
     @Test

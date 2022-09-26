@@ -5,23 +5,20 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
+import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.comment.Comment;
 import ru.practicum.shareit.comment.CommentDto;
 import ru.practicum.shareit.comment.CommentMapper;
+import ru.practicum.shareit.comment.CommentRepository;
 import ru.practicum.shareit.exception.InvalidParameterException;
 import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.exception.RequestNotFoundException;
-import ru.practicum.shareit.item.Item;
-import ru.practicum.shareit.item.ItemDto;
-import ru.practicum.shareit.item.ItemMapper;
-import ru.practicum.shareit.item.ItemService;
+import ru.practicum.shareit.item.*;
 import ru.practicum.shareit.request.Request;
 import ru.practicum.shareit.request.RequestMapper;
+import ru.practicum.shareit.request.RequestRepository;
 import ru.practicum.shareit.request.RequestService;
-import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.user.UserDto;
-import ru.practicum.shareit.user.UserMapper;
-import ru.practicum.shareit.user.UserService;
+import ru.practicum.shareit.user.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -46,9 +43,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class ItemServiceTest<T extends ItemService> {
 
     private final EntityManager em;
+
     private final RequestService requestService;
     private final UserService userService;
     private final ItemService itemService;
+    private final ItemRepository itemRepository;
+    private final BookingRepository bookingRepository;
+    private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
+    private final RequestRepository requestRepository;
 
     @Test
     public void createItemWithoutRequestTest() {
@@ -216,6 +219,8 @@ public class ItemServiceTest<T extends ItemService> {
         var ex = assertThrows(ItemNotFoundException.class,
                 () -> itemService.findItemById(1L, 99L));
         assertThat(ex.getMessage(), equalTo("Item not found"));
+        assertThat(commentRepository.findAllItemComments(1L), equalTo(new HashSet<>()));
+
     }
 
     @Test

@@ -8,6 +8,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.practicum.shareit.exception.InvalidParameterException;
+import ru.practicum.shareit.exception.RequestNotFoundException;
 import ru.practicum.shareit.request.RequestController;
 import ru.practicum.shareit.request.RequestDto;
 import ru.practicum.shareit.request.RequestDtoResponse;
@@ -20,7 +22,8 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = RequestController.class)
@@ -76,6 +79,24 @@ public class RequestControllerTest {
                         .header("X-Sharer-User-Id", "1"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(list)));
+    }
+
+    @Test
+    public void testFindBadRequests() throws Exception {
+        Mockito.when(requestService.findAllRequestsWithResponses(anyLong())).thenThrow(RequestNotFoundException.class);
+
+        mvc.perform(get("/requests")
+                        .header("X-Sharer-User-Id", "1"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testFindInvalidRequests() throws Exception {
+        Mockito.when(requestService.findAllRequestsWithResponses(anyLong())).thenThrow(InvalidParameterException.class);
+
+        mvc.perform(get("/requests")
+                        .header("X-Sharer-User-Id", "1"))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

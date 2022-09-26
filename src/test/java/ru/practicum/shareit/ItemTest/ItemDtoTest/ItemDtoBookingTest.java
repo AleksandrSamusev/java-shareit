@@ -17,13 +17,13 @@ public class ItemDtoBookingTest {
 
     @Test
     void testItemDtoBooking() throws Exception {
-        ItemDtoBooking itemDtoBooking = new ItemDtoBooking(
-                1L,
-                "Wrench",
-                "the best wrench",
-                true,
-                null,
-                null);
+        ItemDtoBooking itemDtoBooking = new ItemDtoBooking();
+        itemDtoBooking.setId(1L);
+        itemDtoBooking.setName("Wrench");
+        itemDtoBooking.setDescription("the best wrench");
+        itemDtoBooking.setIsAvailable(true);
+        itemDtoBooking.setLastBooking(null);
+        itemDtoBooking.setNextBooking(null);
 
         JsonContent<ItemDtoBooking> result = json.write(itemDtoBooking);
 
