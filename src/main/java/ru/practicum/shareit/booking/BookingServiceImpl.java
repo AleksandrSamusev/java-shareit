@@ -164,7 +164,6 @@ public class BookingServiceImpl implements BookingService {
         BookingStatus status = BookingStatus.valueOf(state);
 
         if (status == BookingStatus.ALL) {
-
             List<Booking> list = bookingRepository.findAllOwnersBookings(id);
             list.sort(Comparator.comparing(Booking::getStart).reversed());
             return BookingMapper.toBookingDtos(list);
@@ -184,11 +183,12 @@ public class BookingServiceImpl implements BookingService {
             list.sort(Comparator.comparing(Booking::getStart).reversed());
             return BookingMapper.toBookingDtos(list);
         }
-
-        List<Booking> list = bookingRepository.findAllOwnersBookingsWithStatus(id, status);
-        list.sort(Comparator.comparing(Booking::getStart).reversed());
-        return BookingMapper.toBookingDtos(list);
-
+        if (status == BookingStatus.WAITING || status == BookingStatus.REJECTED) {
+            List<Booking> list = bookingRepository.findAllOwnersBookingsWithStatus(id, status);
+            list.sort(Comparator.comparing(Booking::getStart).reversed());
+            return BookingMapper.toBookingDtos(list);
+        }
+        return null;
     }
 
     private void validateState(String state) {
@@ -213,7 +213,6 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private boolean isValidCreate(Long id, BookingSmallDto bookingSmallDto) {
-
         if (!itemRepository.existsById(bookingSmallDto.getItemId())) {
             throw new ItemNotFoundException("Item not found");
         }

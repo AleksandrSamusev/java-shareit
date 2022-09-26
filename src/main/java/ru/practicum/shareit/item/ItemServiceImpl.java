@@ -66,12 +66,6 @@ public class ItemServiceImpl implements ItemService {
         if (itemDto.getDescription() != null && !itemDto.getDescription().equals("")) {
             temp.setDescription(itemDto.getDescription());
         }
-        if (itemDto.getOwner().getId() != null && itemDto.getOwner().getId() != 0) {
-            temp.setOwner(UserMapper.toUser(itemDto.getOwner()));
-        }
-        if (itemDto.getRequestId() != null && itemDto.getRequestId() != 0) {
-            temp.setRequestId(itemDto.getRequestId());
-        }
         return ItemMapper.toItemDto(itemRepository.save(temp));
     }
 
@@ -88,23 +82,31 @@ public class ItemServiceImpl implements ItemService {
 
         if (Objects.equals(itemRepository.getReferenceById(itemId).getOwner().getId(), userId)) {
             List<Booking> bookingPast = bookingRepository.findAllItemBookingsPast(itemId);
-            if (bookingPast.size() != 0) {
-                bookingPast.sort(Comparator.comparing(Booking::getStart).reversed());
-                BookingDto bookingDtoPast = BookingMapper.toBookingDto(bookingPast.get(0));
-                bookingDtoPast.setBookerId(bookingDtoPast.getBooker().getId());
-                bookingDtoPast.setBooker(null);
-                itemDto.setLastBooking(bookingDtoPast);
-            }
+            sortBookingsPast(itemDto, bookingPast);
             List<Booking> bookingFuture = bookingRepository.findAllItemBookingsFuture(itemId);
-            if (bookingFuture.size() != 0) {
-                bookingFuture.sort(Comparator.comparing(Booking::getStart));
-                BookingDto bookingDtoFuture = BookingMapper.toBookingDto(bookingFuture.get(0));
-                bookingDtoFuture.setBookerId(bookingDtoFuture.getBooker().getId());
-                bookingDtoFuture.setBooker(null);
-                itemDto.setNextBooking(bookingDtoFuture);
-            }
+            sortBookingsFuture(itemDto, bookingFuture);
         }
         return itemDto;
+    }
+
+    private void sortBookingsPast(ItemDto itemDto, List<Booking> bookingPast) {
+        if (bookingPast.size() != 0) {
+            bookingPast.sort(Comparator.comparing(Booking::getStart).reversed());
+            BookingDto bookingDtoPast = BookingMapper.toBookingDto(bookingPast.get(0));
+            bookingDtoPast.setBookerId(bookingDtoPast.getBooker().getId());
+            bookingDtoPast.setBooker(null);
+            itemDto.setLastBooking(bookingDtoPast);
+        }
+    }
+
+    private void sortBookingsFuture(ItemDto itemDto, List<Booking> bookingFuture) {
+        if (bookingFuture.size() != 0) {
+            bookingFuture.sort(Comparator.comparing(Booking::getStart));
+            BookingDto bookingDtoFuture = BookingMapper.toBookingDto(bookingFuture.get(0));
+            bookingDtoFuture.setBookerId(bookingDtoFuture.getBooker().getId());
+            bookingDtoFuture.setBooker(null);
+            itemDto.setNextBooking(bookingDtoFuture);
+        }
     }
 
     @Override
@@ -115,21 +117,9 @@ public class ItemServiceImpl implements ItemService {
 
         for (ItemDto itemDto : itemDtoList) {
             List<Booking> bookingPast = bookingRepository.findAllItemBookingsPast(itemDto.getId());
-            if (bookingPast.size() != 0) {
-                bookingPast.sort(Comparator.comparing(Booking::getStart).reversed());
-                BookingDto bookingDtoPast = BookingMapper.toBookingDto(bookingPast.get(0));
-                bookingDtoPast.setBookerId(bookingDtoPast.getBooker().getId());
-                bookingDtoPast.setBooker(null);
-                itemDto.setLastBooking(bookingDtoPast);
-            }
+            sortBookingsPast(itemDto, bookingPast);
             List<Booking> bookingFuture = bookingRepository.findAllItemBookingsFuture(itemDto.getId());
-            if (bookingFuture.size() != 0) {
-                bookingFuture.sort(Comparator.comparing(Booking::getStart));
-                BookingDto bookingDtoFuture = BookingMapper.toBookingDto(bookingFuture.get(0));
-                bookingDtoFuture.setBookerId(bookingDtoFuture.getBooker().getId());
-                bookingDtoFuture.setBooker(null);
-                itemDto.setNextBooking(bookingDtoFuture);
-            }
+            sortBookingsFuture(itemDto, bookingFuture);
         }
         itemDtoList.sort(Comparator.comparing(ItemDto::getId));
         return itemDtoList;

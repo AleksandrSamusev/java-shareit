@@ -6,10 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import ru.practicum.shareit.booking.*;
-import ru.practicum.shareit.exception.BookingNotFoundException;
-import ru.practicum.shareit.exception.InvalidParameterException;
-import ru.practicum.shareit.exception.UserNotFoundException;
-import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.exception.*;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.ItemService;
@@ -68,15 +65,18 @@ public class BookingServiceTest<T extends BookingService> {
         dto.setStart(LocalDateTime.of(2023, 12, 31, 12, 30));
         dto.setEnd(LocalDateTime.of(2024, 12, 31, 12, 30));
         dto.setItemId(1L);
-
         bookingService.create(2L, dto);
+
+        BookingSmallDto dtoWithBadItem = new BookingSmallDto();
+        dtoWithBadItem.setItemId(999L);
 
         TypedQuery<Booking> query = em.createQuery("SELECT b FROM Booking b WHERE b.booker.name " +
                 "= :name", Booking.class);
         Booking booking = query.setParameter("name", user2.getName()).getSingleResult();
 
         assertThat(booking.getBooker().getName(), equalTo("user2"));
-
+        assertThrows(ItemNotFoundException.class,
+                () -> bookingService.create(1L, dtoWithBadItem));
     }
 
     @Test
@@ -199,10 +199,6 @@ public class BookingServiceTest<T extends BookingService> {
 
         list = bookingService.findBookingByIdAndStatus("REJECTED", 2L, 0, 1);
         assertThat(list.size(), equalTo(0));
-
-        list = bookingService.findBookingByIdAndStatus("ALL", 2L, 0, 1);
-        assertThat(list.size(), equalTo(1));
-
     }
 
     @Test
