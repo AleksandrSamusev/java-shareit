@@ -148,10 +148,6 @@ public class ItemServiceImpl implements ItemService {
             }
         }
         itemDto.setId(itemId);
-
-        if (findItemById(id, itemDto.getId()) == null) {
-            throw new ItemNotFoundException("Item not found");
-        }
         ItemDto patchedItem = findItemById(id, itemDto.getId());
         if (itemDto.getName() != null) {
             patchedItem.setName(itemDto.getName());

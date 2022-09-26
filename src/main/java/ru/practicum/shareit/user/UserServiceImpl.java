@@ -49,9 +49,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto patchUser(UserDto userDto, Long userId) {
         userDto.setId(userId);
-        if (findUserById(userDto.getId()) == null) {
-            throw new UserNotFoundException("User not found");
-        }
         UserDto patchedUser = findUserById(userDto.getId());
         if (userDto.getName() != null) {
             patchedUser.setName(userDto.getName());

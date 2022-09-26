@@ -5,7 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
-import ru.practicum.shareit.exception.*;
+import ru.practicum.shareit.exception.InvalidParameterException;
+import ru.practicum.shareit.exception.UserNotFoundException;
+import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserDto;
 import ru.practicum.shareit.user.UserMapper;
@@ -140,5 +142,16 @@ public class UserServiceTest<T extends UserService> {
         assertThrows(ValidationException.class,
                 () -> userService.patchUser(patchedUserWithBadEmail, 1L));
 
+    }
+
+    @Test
+    public void testFindBadUserById() throws Exception {
+        User user = new User();
+        user.setName("user");
+        user.setEmail("user@user.ru");
+        userService.createUser(UserMapper.toUserDto(user));
+
+        assertThrows(UserNotFoundException.class,
+                () -> userService.findUserById(99L));
     }
 }

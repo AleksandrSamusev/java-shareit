@@ -12,6 +12,7 @@ import ru.practicum.shareit.comment.CommentRepository;
 import ru.practicum.shareit.exception.InvalidParameterException;
 import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.exception.RequestNotFoundException;
+import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.ItemDto;
 import ru.practicum.shareit.item.ItemMapper;
@@ -308,6 +309,9 @@ public class ItemServiceTest<T extends ItemService> {
         ItemDto testItem = itemService.patchItem(patchedItem, 1L, 1L);
         assertThat(patchedItem.getName(), equalTo(testItem.getName()));
         assertThat(patchedItem.getDescription(), equalTo(testItem.getDescription()));
+
+        assertThrows(ItemNotFoundException.class,
+                () -> itemService.patchItem(patchedItem, 1L, 2L));
     }
 
     @Test
@@ -341,6 +345,9 @@ public class ItemServiceTest<T extends ItemService> {
         CommentDto commentDto = CommentMapper.toCommentDto(comment);
         itemService.postComment(2L, 1L, commentDto);
         assertThat(itemService.findItemById(1L, 1L).getComments().size(), equalTo(0));
+
+        assertThrows(UserNotFoundException.class,
+                () -> itemService.postComment(999L, 1L, commentDto));
 
     }
 
