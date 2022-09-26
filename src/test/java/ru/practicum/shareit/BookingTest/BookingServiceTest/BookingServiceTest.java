@@ -6,7 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import ru.practicum.shareit.booking.*;
-import ru.practicum.shareit.exception.*;
+import ru.practicum.shareit.exception.BookingNotFoundException;
+import ru.practicum.shareit.exception.InvalidParameterException;
+import ru.practicum.shareit.exception.UserNotFoundException;
+import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.ItemService;
@@ -39,6 +42,7 @@ public class BookingServiceTest<T extends BookingService> {
     private final UserService userService;
     private final ItemService itemService;
     private final BookingService bookingService;
+    private final BookingRepository bookingRepository;
 
 
     @Test
@@ -195,6 +199,10 @@ public class BookingServiceTest<T extends BookingService> {
 
         list = bookingService.findBookingByIdAndStatus("REJECTED", 2L, 0, 1);
         assertThat(list.size(), equalTo(0));
+
+        list = bookingService.findBookingByIdAndStatus("ALL", 2L, 0, 1);
+        assertThat(list.size(), equalTo(1));
+
     }
 
     @Test

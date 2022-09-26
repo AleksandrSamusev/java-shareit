@@ -1,7 +1,6 @@
 package ru.practicum.shareit.request;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.item.ItemDtoRequest;

@@ -2,7 +2,6 @@ package ru.practicum.shareit.ItemTest.ItemServiceTest;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
@@ -16,7 +15,9 @@ import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.ItemDto;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.ItemService;
-import ru.practicum.shareit.request.*;
+import ru.practicum.shareit.request.Request;
+import ru.practicum.shareit.request.RequestMapper;
+import ru.practicum.shareit.request.RequestService;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserDto;
 import ru.practicum.shareit.user.UserMapper;
@@ -26,13 +27,13 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyLong;
 
 @Transactional
 @SpringBootTest(
@@ -163,7 +164,6 @@ public class ItemServiceTest<T extends ItemService> {
         user.setEmail("user@user.ru");
         userService.createUser(user);
 
-
         ItemDto item = new ItemDto();
         item.setIsAvailable(true);
         item.setName("Screwdriver");
@@ -205,6 +205,7 @@ public class ItemServiceTest<T extends ItemService> {
         item.setName("Screwdriver");
         item.setOwner(user);
         item.setDescription("This is the best screwdriver in the world!");
+        item.setComments(new HashSet<>());
         itemService.createItem(1L, null, item);
 
         ItemDto itemResponce = itemService.findItemById(1L, 1L);
