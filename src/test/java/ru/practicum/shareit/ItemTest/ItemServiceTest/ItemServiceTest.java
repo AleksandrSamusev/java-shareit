@@ -2,9 +2,13 @@ package ru.practicum.shareit.ItemTest.ItemServiceTest;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
+import ru.practicum.shareit.comment.Comment;
+import ru.practicum.shareit.comment.CommentDto;
+import ru.practicum.shareit.comment.CommentMapper;
 import ru.practicum.shareit.exception.InvalidParameterException;
 import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.exception.RequestNotFoundException;
@@ -28,6 +32,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyLong;
 
 @Transactional
 @SpringBootTest(
@@ -301,22 +306,35 @@ public class ItemServiceTest<T extends ItemService> {
 
     @Test
     public void createCommentTest() {
-        UserDto user = new UserDto();
+
+        User user = new User();
         user.setName("user");
         user.setEmail("user@user.ru");
-        userService.createUser(user);
+        userService.createUser(UserMapper.toUserDto(user));
 
-        UserDto user2 = new UserDto();
+        User user2 = new User();
         user2.setName("user2");
         user2.setEmail("user2@user.ru");
-        userService.createUser(user2);
+        userService.createUser(UserMapper.toUserDto(user2));
 
-        ItemDto item = new ItemDto();
+        Item item = new Item();
         item.setIsAvailable(true);
         item.setName("Screwdriver");
         item.setOwner(user);
         item.setDescription("This is the best screwdriver in the world!");
-        itemService.createItem(1L, null, item);
+
+        ItemDto itemDto = ItemMapper.toItemDto(item);
+        itemService.createItem(1L, null, itemDto);
+
+        Comment comment = new Comment();
+
+        comment.setText("super");
+        comment.setAuthor(user2);
+        comment.setItem(ItemMapper.toItem(itemDto));
+        comment.setCreated(LocalDateTime.now());
+        CommentDto commentDto = CommentMapper.toCommentDto(comment);
+        itemService.postComment(2L, 1L, commentDto);
+        assertThat(itemService.findItemById(1L, 1L).getComments().size(), equalTo(0));
 
     }
 }

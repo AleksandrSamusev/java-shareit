@@ -8,7 +8,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import ru.practicum.shareit.comment.CommentDto;
+import ru.practicum.shareit.exception.InvalidParameterException;
+import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.ItemController;
 import ru.practicum.shareit.item.ItemDto;
 import ru.practicum.shareit.item.ItemServiceImpl;
@@ -55,6 +58,23 @@ public class ItemControllerTest {
 
                 .andExpect(status().isOk());
 
+    }
+
+    @Test
+    void createItemWithException() throws Exception {
+
+        ItemDto itemDto = new ItemDto(null, "Wrench");
+
+        when(itemService.createItem(anyLong(), anyLong(), any()))
+                .thenThrow(InvalidParameterException.class);
+
+        mvc.perform(post("/items")
+                        .content(mapper.writeValueAsString(itemDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().is(400));
     }
 
     @Test
@@ -136,4 +156,5 @@ public class ItemControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
+
 }
