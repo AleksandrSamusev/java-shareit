@@ -11,11 +11,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import ru.practicum.shareit.comment.CommentDto;
 import ru.practicum.shareit.exception.InvalidParameterException;
-import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.ItemController;
 import ru.practicum.shareit.item.ItemDto;
 import ru.practicum.shareit.item.ItemServiceImpl;
-import ru.practicum.shareit.user.*;
+import ru.practicum.shareit.user.UserServiceImpl;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;

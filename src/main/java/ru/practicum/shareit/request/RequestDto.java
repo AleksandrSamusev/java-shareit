@@ -12,4 +12,5 @@ public class RequestDto {
     private Long id;
     private String description;
     private UserDto requestor;
-    private LocalDateTime created = LocalDateTime.now();}
+    private LocalDateTime created = LocalDateTime.now();
+}

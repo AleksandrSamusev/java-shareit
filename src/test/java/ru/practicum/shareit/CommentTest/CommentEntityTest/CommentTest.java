@@ -6,11 +6,6 @@ import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
 import ru.practicum.shareit.comment.Comment;
-import ru.practicum.shareit.comment.CommentDto;
-import ru.practicum.shareit.item.ItemDto;
-import ru.practicum.shareit.user.UserDto;
-
-import java.time.LocalDateTime;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
