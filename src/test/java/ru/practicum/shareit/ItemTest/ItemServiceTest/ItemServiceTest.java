@@ -18,6 +18,7 @@ import ru.practicum.shareit.item.ItemDto;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.request.Request;
+import ru.practicum.shareit.request.RequestDto;
 import ru.practicum.shareit.request.RequestMapper;
 import ru.practicum.shareit.request.RequestService;
 import ru.practicum.shareit.user.User;
@@ -29,8 +30,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -350,6 +353,155 @@ public class ItemServiceTest<T extends ItemService> {
                 () -> itemService.postComment(999L, 1L, commentDto));
 
     }
+
+    @Test
+    public void testMappingToComment() {
+        UserDto user = new UserDto();
+        user.setId(1L);
+        user.setName("user");
+        user.setEmail("user@user.ru");
+
+        UserDto user2 = new UserDto();
+        user2.setId(2L);
+        user2.setName("user2");
+        user2.setEmail("user2@user2.ru");
+
+        RequestDto requestDto = new RequestDto();
+        requestDto.setId(1L);
+        requestDto.setRequestor(user2);
+        requestDto.setDescription("need something");
+        requestDto.setCreated(LocalDateTime.now());
+
+        ItemDto itemDto = new ItemDto();
+        itemDto.setId(1L);
+        itemDto.setOwner(user);
+        itemDto.setName("screwdriver");
+        itemDto.setDescription("best item ever");
+        itemDto.setIsAvailable(true);
+        itemDto.setRequestId(1L);
+
+        CommentDto commentDto = new CommentDto();
+        commentDto.setId(1L);
+        commentDto.setText("good");
+        commentDto.setItem(itemDto);
+        commentDto.setAuthor(user2);
+        commentDto.setAuthorName("user2");
+
+        Comment comment = CommentMapper.toComment(commentDto);
+
+        assertThat(CommentMapper.toComment(commentDto).getClass(), equalTo(Comment.class));
+        assertThat(CommentMapper.toComment(commentDto).getAuthor().getName(), equalTo(user2.getName()));
+        assertThat(CommentMapper.toComment(commentDto).getItem().getRequestId(), equalTo(1L));
+    }
+
+
+    @Test
+    public void testMappingToCommentDto() {
+        User user = new User();
+        user.setId(1L);
+        user.setName("user");
+        user.setEmail("user@user.ru");
+
+        User user2 = new User();
+        user2.setId(2L);
+        user2.setName("user2");
+        user2.setEmail("user2@user2.ru");
+
+        Item item = new Item();
+        item.setId(1L);
+        item.setOwner(user);
+        item.setName("screwdriver");
+        item.setDescription("best item ever");
+        item.setIsAvailable(true);
+        item.setRequestId(1L);
+
+        Request request = new Request();
+        request.setId(1L);
+        request.setRequestor(user2);
+        request.setDescription("need something");
+        request.setCreated(LocalDateTime.now());
+
+
+        Comment comment = new Comment();
+        comment.setId(1L);
+        comment.setText("good");
+        comment.setItem(item);
+        comment.setAuthor(user2);
+
+        CommentDto commentDto = CommentMapper.toCommentDto(comment);
+
+        assertThat(commentDto.getClass(), equalTo(CommentDto.class));
+        assertThat(commentDto.getText(), equalTo(comment.getText()));
+        assertThat(commentDto.getItem().getRequestId(), equalTo(1L));
+    }
+
+
+    @Test
+    public void testToCommentDtos() {
+
+        User user = new User();
+        user.setId(1L);
+        user.setName("user");
+        user.setEmail("user@user.ru");
+
+        User user2 = new User();
+        user2.setId(2L);
+        user2.setName("user2");
+        user2.setEmail("user2@user2.ru");
+
+        Item item = new Item();
+        item.setId(1L);
+        item.setOwner(user);
+        item.setName("screwdriver");
+        item.setDescription("best item ever");
+        item.setIsAvailable(true);
+        item.setRequestId(2L);
+
+
+        Item item2 = new Item();
+        item2.setId(2L);
+        item2.setOwner(user2);
+        item2.setName("screwdriver2");
+        item2.setDescription("best item ever 2");
+        item2.setIsAvailable(true);
+        item2.setRequestId(1L);
+
+        Request request = new Request();
+        request.setId(1L);
+        request.setRequestor(user);
+        request.setDescription("need something");
+        request.setCreated(LocalDateTime.now());
+
+        Request request2 = new Request();
+        request2.setId(2L);
+        request2.setRequestor(user2);
+        request2.setDescription("need something too");
+        request2.setCreated(LocalDateTime.now());
+
+        Comment comment = new Comment();
+        comment.setId(1L);
+        comment.setText("good");
+        comment.setItem(item);
+        comment.setAuthor(user2);
+
+        Comment comment2 = new Comment();
+        comment2.setId(2L);
+        comment2.setText("very good");
+        comment2.setItem(item2);
+        comment2.setAuthor(user);
+
+        Set<Comment> comments = new HashSet<>();
+        comments.add(comment);
+        comments.add(comment2);
+
+        Set<CommentDto> commentDtos = CommentMapper.toCommentDtos(comments);
+
+        assertThat(commentDtos.size(), equalTo(2));
+        assertThat(new ArrayList<>(commentDtos).get(0).getId(), equalTo(2L));
+        assertThat(new ArrayList<>(commentDtos).get(1).getId(), equalTo(1L));
+
+    }
+
 
 }
 

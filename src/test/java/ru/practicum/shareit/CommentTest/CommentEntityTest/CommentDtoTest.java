@@ -47,4 +47,5 @@ public class CommentDtoTest {
         assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(1);
         assertThat(result).extractingJsonPathStringValue("$.text").isEqualTo("super");
     }
+
 }

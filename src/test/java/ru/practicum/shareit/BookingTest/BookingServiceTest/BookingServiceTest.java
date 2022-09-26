@@ -33,7 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
         properties = "db.name=shareit",
         webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-
 @Sql(scripts = "/schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 
 public class BookingServiceTest<T extends BookingService> {
