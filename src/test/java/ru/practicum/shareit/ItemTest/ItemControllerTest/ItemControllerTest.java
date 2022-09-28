@@ -30,17 +30,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class ItemControllerTest {
 
     @Autowired
-    ObjectMapper mapper;
+    private ObjectMapper mapper;
 
     @MockBean
-    ItemServiceImpl itemService;
+    private ItemServiceImpl itemService;
 
     @Autowired
     private MockMvc mvc;
-
-    @MockBean
-    UserServiceImpl userService;
-
 
     @Test
     public void createNewItemTest() throws Exception {

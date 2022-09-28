@@ -12,13 +12,13 @@ import java.util.List;
 @Slf4j
 @RequestMapping("/items")
 public class ItemController {
+
     private final ItemServiceImpl itemService;
-    private final UserServiceImpl userService;
 
     @Autowired
-    public ItemController(ItemServiceImpl itemService, UserServiceImpl userService) {
+    public ItemController(ItemServiceImpl itemService) {
         this.itemService = itemService;
-        this.userService = userService;
+
     }
 
     @PostMapping

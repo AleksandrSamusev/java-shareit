@@ -497,11 +497,6 @@ public class ItemServiceTest<T extends ItemService> {
         Set<CommentDto> commentDtos = CommentMapper.toCommentDtos(comments);
 
         assertThat(commentDtos.size(), equalTo(2));
-        assertThat(new ArrayList<>(commentDtos).get(0).getId(), equalTo(2L));
-        assertThat(new ArrayList<>(commentDtos).get(1).getId(), equalTo(1L));
-
     }
-
-
 }
 

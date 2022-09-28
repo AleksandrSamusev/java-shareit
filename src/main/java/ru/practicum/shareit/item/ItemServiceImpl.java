@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.Booking;
@@ -22,6 +23,7 @@ import ru.practicum.shareit.user.UserServiceImpl;
 import java.time.LocalDateTime;
 import java.util.*;
 
+@Slf4j
 @Service
 public class ItemServiceImpl implements ItemService {
 
@@ -52,6 +54,7 @@ public class ItemServiceImpl implements ItemService {
             validateRequest(requestId);
             itemDto.setRequestId(requestId);
         }
+        log.info("Item created by user with ID = {}", id);
         return ItemMapper.toItemDto(itemRepository.save(ItemMapper.toItem(itemDto)));
     }
 
@@ -66,6 +69,7 @@ public class ItemServiceImpl implements ItemService {
         if (itemDto.getDescription() != null && !itemDto.getDescription().equals("")) {
             temp.setDescription(itemDto.getDescription());
         }
+        log.info("Updated item with ID = {} ", itemDto.getId());
         return ItemMapper.toItemDto(itemRepository.save(temp));
     }
 
@@ -86,6 +90,7 @@ public class ItemServiceImpl implements ItemService {
             List<Booking> bookingFuture = bookingRepository.findAllItemBookingsFuture(itemId);
             sortBookingsFuture(itemDto, bookingFuture);
         }
+        log.info("Returned item with ID = {}", itemId);
         return itemDto;
     }
 
@@ -96,6 +101,7 @@ public class ItemServiceImpl implements ItemService {
             bookingDtoPast.setBookerId(bookingDtoPast.getBooker().getId());
             bookingDtoPast.setBooker(null);
             itemDto.setLastBooking(bookingDtoPast);
+            log.info("Past booking sorting...");
         }
     }
 
@@ -106,6 +112,7 @@ public class ItemServiceImpl implements ItemService {
             bookingDtoFuture.setBookerId(bookingDtoFuture.getBooker().getId());
             bookingDtoFuture.setBooker(null);
             itemDto.setNextBooking(bookingDtoFuture);
+            log.info("Future booking sorting...");
         }
     }
 
@@ -122,6 +129,7 @@ public class ItemServiceImpl implements ItemService {
             sortBookingsFuture(itemDto, bookingFuture);
         }
         itemDtoList.sort(Comparator.comparing(ItemDto::getId));
+        log.info("Returned the list of items of user with ID = {}", id);
         return itemDtoList;
     }
 
@@ -137,6 +145,7 @@ public class ItemServiceImpl implements ItemService {
                 }
             }
         }
+        log.info("Returned the list of items/ List size = {}", availableItems.size());
         return ItemMapper.toItemDtos(availableItems);
     }
 
@@ -144,6 +153,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto patchItem(ItemDto itemDto, Long itemId, Long id) {
         if (findItemById(id, itemId) != null) {
             if (!Objects.equals(findItemById(id, itemId).getOwner().getId(), id)) {
+                log.info("ItemNotFoundException: Вещь не принадлежит юзеру");
                 throw new ItemNotFoundException("Вещь не принадлежит юзеру");
             }
         }
@@ -158,6 +168,7 @@ public class ItemServiceImpl implements ItemService {
         if (itemDto.getIsAvailable() != null) {
             patchedItem.setIsAvailable(itemDto.getIsAvailable());
         }
+        log.info("Returned item with ID = {}", itemId);
         return patchedItem;
     }
 
@@ -177,8 +188,10 @@ public class ItemServiceImpl implements ItemService {
                 commentTempDto.setAuthorName(userRepository.getReferenceById(userId).getName());
                 commentTempDto.setAuthor(null);
                 commentTempDto.setItem(null);
+                log.info("User with id = {} posted comment", userId);
                 return commentTempDto;
             } else {
+                log.info("InvalidParameterException: Invalid parameter");
                 throw new InvalidParameterException("Invalid parameter");
             }
         }
@@ -187,34 +200,41 @@ public class ItemServiceImpl implements ItemService {
 
     private void validateUser(Long id) {
         if (!userRepository.existsById(id)) {
+            log.info("UserNotFoundException: User not found");
             throw new UserNotFoundException("User not found");
         }
     }
 
     private void validateItem(Long itemId) {
         if (!itemRepository.existsById(itemId)) {
+            log.info("ItemNotFoundException: Item not found");
             throw new ItemNotFoundException("Item not found");
         }
     }
 
     private void validateItemDto(ItemDto itemDto) {
         if (itemDto.getIsAvailable() == null) {
+            log.info("InvalidParameterException: Item isAvailable is empty");
             throw new InvalidParameterException("Item isAvailable is empty");
         } else if (itemDto.getName() == null || itemDto.getName().equals("")) {
+            log.info("InvalidParameterException: Item name is empty");
             throw new InvalidParameterException("Item name is empty");
         } else if (itemDto.getDescription() == null || itemDto.getDescription().equals("")) {
+            log.info("InvalidParameterException: Item description is empty");
             throw new InvalidParameterException("Item description is empty");
         }
     }
 
     private void validateComment(CommentDto commentDto) {
         if (commentDto.getText().isEmpty() || commentDto.getText().isBlank()) {
+            log.info("InvalidParameterException: Text field is empty");
             throw new InvalidParameterException("Text field is empty");
         }
     }
 
     private void validateRequest(Long requestId) {
         if (!requestRepository.existsById(requestId)) {
+            log.info("RequestNotFoundException: Request not found");
             throw new RequestNotFoundException("Request not found");
         }
     }
