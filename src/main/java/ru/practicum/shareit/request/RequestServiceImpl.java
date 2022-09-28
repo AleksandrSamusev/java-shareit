@@ -5,7 +5,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
 import ru.practicum.shareit.exception.InvalidParameterException;
 import ru.practicum.shareit.exception.RequestNotFoundException;
 import ru.practicum.shareit.exception.UserNotFoundException;
@@ -79,7 +78,7 @@ public class RequestServiceImpl implements RequestService {
                 tempResponse.setItems(ItemMapper.toItemRequestDtos(itemRepository.findAllByRequestId(request.getId())));
                 listForResponse.add(tempResponse);
             }
-            log.info("Returned {} requests from page {}", size, from/size);
+            log.info("Returned {} requests from page {}", size, from / size);
             return listForResponse;
         }
         log.info("Returned list of all requests with responses");

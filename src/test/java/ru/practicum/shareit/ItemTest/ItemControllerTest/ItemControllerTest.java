@@ -15,7 +15,6 @@ import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.item.ItemController;
 import ru.practicum.shareit.item.ItemDto;
 import ru.practicum.shareit.item.ItemServiceImpl;
-import ru.practicum.shareit.user.UserServiceImpl;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
