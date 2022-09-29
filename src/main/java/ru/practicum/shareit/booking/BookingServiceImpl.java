@@ -156,29 +156,28 @@ public class BookingServiceImpl implements BookingService {
                 && !state.equals(BookingStatus.WAITING.name()) && !state.equals(BookingStatus.CURRENT.name())
                 && !state.equals(BookingStatus.APPROVED.name()) && !state.equals(BookingStatus.CANCELED.name())
                 && !state.equals(BookingStatus.PAST.name()) && !state.equals(BookingStatus.FUTURE.name())) {
-            log.info("ValidationException: Unknown state: UNSUPPORTED_STATUS");
+            log.info("ValidationException: Unknown state: \"{}\"", state);
             throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
         }
     }
 
     private void validateUser(Long id) {
         if (!userRepository.existsById(id)) {
-            log.info("UserNotFoundException: User not found");
+            log.info("UserNotFoundException: User with ID = {} not found", id);
             throw new UserNotFoundException("User not found");
         }
     }
 
     private void validateBooking(Long bookingId) {
         if (!bookingRepository.existsById(bookingId)) {
-            log.info("BookingNotFoundException: Booking not found");
+            log.info("BookingNotFoundException: Booking with ID = {} not found", bookingId);
             throw new BookingNotFoundException("Booking not found");
         }
     }
 
-
     private boolean isValidCreate(Long id, BookingSmallDto bookingSmallDto) {
         if (!itemRepository.existsById(bookingSmallDto.getItemId())) {
-            log.info("ItemNotFoundException: Item not found");
+            log.info("ItemNotFoundException: Item with ID = {} not found", bookingSmallDto.getItemId());
             throw new ItemNotFoundException("Item not found");
         }
         if (id.equals(itemRepository.getReferenceById(
@@ -199,7 +198,7 @@ public class BookingServiceImpl implements BookingService {
             throw new InvalidParameterException("Start date in past");
         }
         if (!userRepository.existsById(id)) {
-            log.info("UserNotFoundException: User not found");
+            log.info("UserNotFoundException: User with ID = {} not found", id);
             throw new UserNotFoundException("User not found");
         }
         if (itemRepository.existsById(bookingSmallDto.getItemId())) {

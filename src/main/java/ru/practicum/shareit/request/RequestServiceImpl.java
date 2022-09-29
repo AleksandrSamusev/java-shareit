@@ -96,30 +96,26 @@ public class RequestServiceImpl implements RequestService {
 
     private void validateUserId(Long id) {
         if (id == null || !userRepository.existsById(id)) {
-            log.info("UserNotFoundException: User not found");
+            log.info("UserNotFoundException: User with ID = {} not found", id);
             throw new UserNotFoundException("User not found");
         }
     }
 
     private void validateRequestId(Long id) {
         if (!requestRepository.existsById(id)) {
-            log.info("RequestNotFoundException: Request not found");
+            log.info("RequestNotFoundException: Request with ID = {} not found", id);
             throw new RequestNotFoundException("Request not found");
         }
     }
 
     private void validatePaginationParameters(Integer from, Integer size) {
-        if (from != null) {
-            if (from < 0) {
-                log.info("InvalidParameterException: Parameter (from) should be > or = 0");
-                throw new InvalidParameterException("Parameter \"from\" should be > or = 0");
-            }
+        if (from != null && from < 0) {
+            log.info("InvalidParameterException: Parameter (from) should be > or = 0");
+            throw new InvalidParameterException("Parameter \"from\" should be > or = 0");
         }
-        if (size != null) {
-            if (size <= 0) {
-                log.info("InvalidParameterException: Parameter (size) should be > 0");
-                throw new InvalidParameterException("Parameter \"size\" should be > 0");
-            }
+        if (size != null && size <= 0) {
+            log.info("InvalidParameterException: Parameter (size) should be > 0");
+            throw new InvalidParameterException("Parameter \"size\" should be > 0");
         }
     }
 }
