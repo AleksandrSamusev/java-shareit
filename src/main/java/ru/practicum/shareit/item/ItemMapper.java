@@ -43,20 +43,25 @@ public class ItemMapper {
         return tempList;
     }
 
-    public static ItemDtoBooking toItemDtoBooking(Item item) {
-        ItemDtoBooking itemDtoBooking = new ItemDtoBooking();
-        itemDtoBooking.setId(item.getId());
-        itemDtoBooking.setName(item.getName());
-        itemDtoBooking.setDescription(item.getDescription());
-        itemDtoBooking.setIsAvailable(item.getIsAvailable());
-        return itemDtoBooking;
+
+    public static ItemDtoRequest toItemDtoRequest(Item item) {
+        ItemDtoRequest itemDtoRequest = new ItemDtoRequest();
+        itemDtoRequest.setId(item.getId());
+        itemDtoRequest.setName(item.getName());
+        itemDtoRequest.setDescription(item.getDescription());
+        itemDtoRequest.setIsAvailable(item.getIsAvailable());
+        itemDtoRequest.setRequestId(item.getRequestId());
+
+
+        return itemDtoRequest;
     }
 
-    public static List<ItemDtoBooking> toItemBookingDtos(List<Item> items) {
-        List<ItemDtoBooking> tempList = new ArrayList<>();
+    public static List<ItemDtoRequest> toItemRequestDtos(List<Item> items) {
+        List<ItemDtoRequest> tempList = new ArrayList<>();
         for (Item item : items) {
-            tempList.add(toItemDtoBooking(item));
+            tempList.add(toItemDtoRequest(item));
         }
         return tempList;
     }
+
 }

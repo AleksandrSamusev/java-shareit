@@ -1,5 +1,4 @@
 package ru.practicum.shareit.item;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -14,10 +13,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class ItemDto {
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long id;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

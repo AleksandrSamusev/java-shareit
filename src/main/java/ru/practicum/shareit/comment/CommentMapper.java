@@ -36,11 +36,4 @@ public class CommentMapper {
         return dtos;
     }
 
-    public static Set<Comment> toComment(Set<CommentDto> commentsDto) {
-        Set<Comment> dtos = new HashSet<>();
-        for (CommentDto commentDto : commentsDto) {
-            dtos.add(toComment(commentDto));
-        }
-        return dtos;
-    }
 }
