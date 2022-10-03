@@ -8,7 +8,7 @@ import javax.validation.constraints.Email;
 @Entity
 @Table(name = "users")
 @Data
-public class User {
+public class User { 
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
