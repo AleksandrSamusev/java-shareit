@@ -3,7 +3,8 @@ package ru.practicum.shareit.item;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.comment.CommentDto;
+import ru.practicum.shareit.comment.entity.CommentDto;
+import ru.practicum.shareit.item.entity.ItemDto;
 
 import java.util.List;
 
@@ -12,10 +13,10 @@ import java.util.List;
 @RequestMapping("/items")
 public class ItemController {
 
-    private final ItemClient itemService;
+    private final ItemServiceImpl itemService;
 
     @Autowired
-    public ItemController(ItemClient itemService) {
+    public ItemController(ItemServiceImpl itemService) {
         this.itemService = itemService;
 
     }
@@ -24,7 +25,7 @@ public class ItemController {
     public ItemDto createItem(@RequestHeader("X-Sharer-User-Id") Long id,
                               @RequestParam(required = false) Long requestId,
                               @RequestBody ItemDto itemDto) {
-        return ItemClient.post(id, requestId, itemDto);
+        return itemService.createItem(id, requestId, itemDto);
     }
 
     @PatchMapping("/{itemId}")

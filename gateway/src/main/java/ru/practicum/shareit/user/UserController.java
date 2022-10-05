@@ -1,43 +1,46 @@
 package ru.practicum.shareit.user;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.user.entity.UserDto;
 
-@Controller
-@RequiredArgsConstructor
+import java.util.List;
+
+@RestController
 @Slf4j
 @RequestMapping("/users")
-@Validated
 public class UserController {
 
-    private final UserClient userClient;
+    private final UserServiceImpl userService;
+
+    @Autowired
+    public UserController(UserServiceImpl userService) {
+        this.userService = userService;
+    }
 
     @PostMapping
-    public ResponseEntity<Object> createUser(@RequestBody UserDto userDto) {
-        return userClient.createUser(userDto);
+    public UserDto createUser(@RequestBody UserDto userDto) {
+        return userService.createUser(userDto);
     }
 
     @PatchMapping("/{userId}")
-    public ResponseEntity<Object> updateUser(@RequestBody UserDto userDto, @PathVariable Long userId) {
-        return userClient.updateUser(userDto);
+    public UserDto updateUser(@RequestBody UserDto userDto, @PathVariable Long userId) {
+        return userService.updateUser(userService.patchUser(userDto, userId));
     }
 
     @GetMapping
-    public ResponseEntity<Object> getAllUsers() {
-        return userClient.findAllUsers();
+    public List<UserDto> getAllUsers() {
+        return userService.findAllUsers();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getUserById(@PathVariable Long id) {
-        return userClient.findUserById(id);
+    public UserDto getUserById(@PathVariable Long id) {
+        return userService.findUserById(id);
     }
 
     @DeleteMapping("/{id}")
     public void deleteUserById(@PathVariable Long id) {
-        userClient.deleteUserById(id);
+        userService.deleteUserById(id);
     }
 }
