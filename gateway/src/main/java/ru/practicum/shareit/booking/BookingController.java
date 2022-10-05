@@ -1,48 +1,56 @@
 package ru.practicum.shareit.booking;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.client.BookingClient;
-import ru.practicum.shareit.booking.entity.BookItemRequestDto;
-import ru.practicum.shareit.booking.entity.BookingState;
+import ru.practicum.shareit.booking.entity.BookingSmallDto;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
-
-@Controller
-@RequestMapping(path = "/bookings")
-@RequiredArgsConstructor
+@RestController
 @Slf4j
-@Validated
+@RequestMapping("/bookings")
 public class BookingController {
+
     private final BookingClient bookingClient;
 
-    @GetMapping
-    public ResponseEntity<Object> getBookings(@RequestHeader("X-Sharer-User-Id") long userId,
-                                              @RequestParam(name = "state", defaultValue = "all") String stateParam,
-                                              @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
-                                              @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
-        BookingState state = BookingState.from(stateParam)
-                .orElseThrow(() -> new IllegalArgumentException("Unknown state: " + stateParam));
-        log.info("Get booking with state {}, userId={}, from={}, size={}", stateParam, userId, from, size);
-        return bookingClient.getBookings(userId, state, from, size);
+    public BookingController(BookingClient bookingClient) {
+        this.bookingClient = bookingClient;
     }
 
     @PostMapping
-    public ResponseEntity<Object> bookItem(@RequestHeader("X-Sharer-User-Id") long userId,
-                                           @RequestBody @Valid BookItemRequestDto requestDto) {
-        log.info("Creating booking {}, userId={}", requestDto, userId);
-        return bookingClient.bookItem(userId, requestDto);
+    public ResponseEntity<Object> saveBooking(@RequestHeader("X-Sharer-User-Id") Long id,
+                                              @RequestBody BookingSmallDto bookingSmallDto) {
+        return bookingClient.saveBooking(id, bookingSmallDto);
     }
 
     @GetMapping("/{bookingId}")
-    public ResponseEntity<Object> getBooking(@RequestHeader("X-Sharer-User-Id") long userId,
-                                             @PathVariable Long bookingId) {
-        log.info("Get booking {}, userId={}", bookingId, userId);
-        return bookingClient.getBooking(userId, bookingId);
-    }}
+    public ResponseEntity<Object> findBookingById(@RequestHeader("X-Sharer-User-Id") Long id,
+                                                  @PathVariable Long bookingId) {
+        return bookingClient.findBookingById(id, bookingId);
+    }
+
+    @GetMapping
+    public ResponseEntity<Object> findAllBookingsById(@RequestParam(defaultValue = "ALL") String state,
+                                                      @RequestHeader("X-Sharer-User-Id") Long id,
+                                                      @RequestParam(required = false, defaultValue = "0") Integer from,
+                                                      @RequestParam(required = false, defaultValue = "10") Integer size) {
+        return bookingClient.getBookings(id, state, from, size);
+    }
+
+    @PatchMapping("/{bookingId}")
+    public ResponseEntity<Object> confirmOrRejectBooking(@RequestHeader("X-Sharer-User-Id") Long id,
+                                                         @PathVariable Long bookingId,
+                                                         @RequestParam Boolean approved) {
+        return bookingClient.confirmOrRejectBooking(id, bookingId, approved);
+    }
+
+    @GetMapping("/owner")
+    public ResponseEntity<Object> findAllOwnersBookings(@RequestParam(defaultValue = "ALL") String state,
+                                                        @RequestHeader("X-Sharer-User-Id") Long id,
+                                                        @RequestParam(required = false, defaultValue = "0") Integer from,
+                                                        @RequestParam(required = false, defaultValue = "10") Integer size) {
+
+        return bookingClient.findAllOwnersBookings(state, id, from, size);
+    }
+
+}

@@ -7,8 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
-import ru.practicum.shareit.booking.entity.BookItemRequestDto;
-import ru.practicum.shareit.booking.entity.BookingState;
+import ru.practicum.shareit.booking.entity.BookingSmallDto;
 
 import java.util.Map;
 
@@ -26,21 +25,40 @@ public class BookingClient extends BookingBaseClient {
         );
     }
 
-    public ResponseEntity<Object> getBookings(long userId, BookingState state, Integer from, Integer size) {
+    public ResponseEntity<Object> getBookings(long userId, String state, Integer from, Integer size) {
         Map<String, Object> parameters = Map.of(
-                "state", state.name(),
+                "state", state,
                 "from", from,
                 "size", size
         );
         return get("?state={state}&from={from}&size={size}", userId, parameters);
     }
 
-
-    public ResponseEntity<Object> bookItem(long userId, BookItemRequestDto requestDto) {
-        return post("", userId, requestDto);
+    public ResponseEntity<Object> saveBooking(Long id, BookingSmallDto bookingSmallDto) {
+        return post("", id, bookingSmallDto);
     }
 
-    public ResponseEntity<Object> getBooking(long userId, Long bookingId) {
-        return get("/" + bookingId, userId);
+    public ResponseEntity<Object> findBookingById(Long id, Long bookingId) {
+        Map<String, Object> parameters = Map.of(
+                "bookingId", bookingId
+        );
+        return get("/" + bookingId, id, parameters);
+    }
+
+    public ResponseEntity<Object> confirmOrRejectBooking(Long id, Long bookingId, Boolean approved) {
+        Map<String, Object> parameters = Map.of(
+                "bookingId", bookingId,
+                "approved", approved
+        );
+        return patch("/{bookingId}?approved=" + approved, id, parameters, null);
+    }
+
+    public ResponseEntity<Object> findAllOwnersBookings(String state, Long id, Integer from, Integer size) {
+        Map<String, Object> parameters = Map.of(
+                "state", state,
+                "from", from,
+                "size", size
+        );
+        return get("?state={state}&from={from}&size={size}", id, parameters);
     }
 }
