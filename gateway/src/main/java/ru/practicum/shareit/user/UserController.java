@@ -1,46 +1,44 @@
 package ru.practicum.shareit.user;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.user.client.UserClient;
 import ru.practicum.shareit.user.entity.UserDto;
-
-import java.util.List;
 
 @RestController
 @Slf4j
 @RequestMapping("/users")
 public class UserController {
 
-    private final UserServiceImpl userService;
+    private final UserClient userClient;
 
-    @Autowired
-    public UserController(UserServiceImpl userService) {
-        this.userService = userService;
+    public UserController(UserClient userClient) {
+        this.userClient = userClient;
     }
 
     @PostMapping
-    public UserDto createUser(@RequestBody UserDto userDto) {
-        return userService.createUser(userDto);
+    public ResponseEntity<Object> createUser(@RequestBody UserDto userDto) {
+        return userClient.createUser(userDto);
     }
 
     @PatchMapping("/{userId}")
-    public UserDto updateUser(@RequestBody UserDto userDto, @PathVariable Long userId) {
-        return userService.updateUser(userService.patchUser(userDto, userId));
+    public ResponseEntity<Object> updateUser(@RequestBody UserDto userDto, @PathVariable Long userId) {
+        return userClient.updateUser(userDto, userId);
     }
 
     @GetMapping
-    public List<UserDto> getAllUsers() {
-        return userService.findAllUsers();
+    public ResponseEntity<Object> getAllUsers() {
+        return userClient.getAllUsers();
     }
 
     @GetMapping("/{id}")
-    public UserDto getUserById(@PathVariable Long id) {
-        return userService.findUserById(id);
+    public ResponseEntity<Object> getUserById(@PathVariable Long id) {
+        return userClient.getUserById(id);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUserById(@PathVariable Long id) {
-        userService.deleteUserById(id);
+    public ResponseEntity<Object> deleteUserById(@PathVariable Long id) {
+        return userClient.deleteUserById(id);
     }
 }
