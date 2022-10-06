@@ -35,8 +35,8 @@ public class RequestController {
 
     @GetMapping("/all")
     public List<RequestDtoResponse> findAllRequestsWithPagination(@RequestHeader("X-Sharer-User-Id") Long id,
-                                                                  @RequestParam(required = false) Integer from,
-                                                                  @RequestParam(required = false) Integer size) {
+                                                                  @RequestParam(required = false, defaultValue = "0") Integer from,
+                                                                  @RequestParam(required = false, defaultValue = "10") Integer size) {
         return requestService.findAllRequestsWithPagination(id, from, size);
     }
 

@@ -21,15 +21,14 @@ public class ItemController {
 
     @PostMapping
     public ResponseEntity<Object> createItem(@RequestHeader("X-Sharer-User-Id") Long id,
-                                             @RequestParam(required = false) Long requestId,
                                              @RequestBody ItemDto itemDto) {
-        return itemClient.createItem(id, requestId, itemDto);
+        return itemClient.createItem(id, itemDto);
     }
 
     @PatchMapping("/{itemId}")
     public ResponseEntity<Object> updateItem(@RequestHeader("X-Sharer-User-Id") Long id, @PathVariable Long itemId,
                                              @RequestBody ItemDto itemDto) {
-        return itemClient.updateItem(id, itemId, itemDto);
+        return itemClient.updateItem(itemId, id, itemDto);
     }
 
     @GetMapping("/{itemId}")

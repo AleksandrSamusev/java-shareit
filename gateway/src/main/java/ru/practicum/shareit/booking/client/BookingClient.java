@@ -8,11 +8,12 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.shareit.booking.entity.BookingSmallDto;
+import ru.practicum.shareit.client.BaseClient;
 
 import java.util.Map;
 
 @Service
-public class BookingClient extends BookingBaseClient {
+public class BookingClient extends BaseClient {
     private static final String API_PREFIX = "/bookings";
 
     @Autowired
@@ -59,6 +60,6 @@ public class BookingClient extends BookingBaseClient {
                 "from", from,
                 "size", size
         );
-        return get("?state={state}&from={from}&size={size}", id, parameters);
+        return get("/owner?state={state}&from={from}&size={size}", id, parameters);
     }
 }

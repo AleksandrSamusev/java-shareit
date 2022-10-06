@@ -7,10 +7,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
+import ru.practicum.shareit.client.BaseClient;
+import ru.practicum.shareit.exception.InvalidParameterException;
 import ru.practicum.shareit.user.entity.UserDto;
 
 @Service
-public class UserClient extends UserBaseClient {
+public class UserClient extends BaseClient {
 
     private static final String API_PREFIX = "/users";
 
@@ -25,23 +27,30 @@ public class UserClient extends UserBaseClient {
     }
 
     public ResponseEntity<Object> createUser(UserDto userDto) {
-        return post("", null, userDto);
+        validateEmail(userDto);
+        return post("", userDto);
     }
 
-    public ResponseEntity<Object> updateUser(UserDto userDto, Long userId) {
-        return patch("/" + userId, userId, userDto);
+    public ResponseEntity<Object> updateUser(Long userId, UserDto userDto) {
+        return patch("/" + userId, userDto);
     }
 
     public ResponseEntity<Object> getAllUsers() {
-        return get("", null);
+        return get("");
     }
 
     public ResponseEntity<Object> getUserById(Long id) {
-        return get("/" + id, id);
+        return get("/" + id);
     }
 
     public ResponseEntity<Object> deleteUserById(Long id) {
-        return delete("/" + id, id);
+        return delete("/" + id);
+    }
+
+    private void validateEmail(UserDto userDto) {
+        if (userDto.getEmail() == null || !userDto.getEmail().contains("@")) {
+            throw new InvalidParameterException("email is null");
+        }
     }
 
 }

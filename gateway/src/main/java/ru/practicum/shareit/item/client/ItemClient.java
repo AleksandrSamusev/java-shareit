@@ -7,13 +7,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
+import ru.practicum.shareit.client.BaseClient;
 import ru.practicum.shareit.comment.entity.CommentDto;
+import ru.practicum.shareit.exception.InvalidParameterException;
 import ru.practicum.shareit.item.entity.ItemDto;
 
 import java.util.Map;
 
 @Service
-public class ItemClient extends ItemBaseClient {
+public class ItemClient extends BaseClient {
 
     private static final String API_PREFIX = "/items";
 
@@ -27,18 +29,14 @@ public class ItemClient extends ItemBaseClient {
         );
     }
 
-    public ResponseEntity<Object> createItem(Long id, Long requestId, ItemDto itemDto) {
-        Map<String, Object> parameters = Map.of(
-                "requestId", requestId
-        );
-        return post("?{requestId}", id, parameters, itemDto);
+    public ResponseEntity<Object> createItem(Long id, ItemDto itemDto) {
+        validateItemDto(itemDto);
+
+        return post("", id, itemDto);
     }
 
-    public ResponseEntity<Object> updateItem(Long id, Long itemId, ItemDto itemDto) {
-        Map<String, Object> parameters = Map.of(
-                "itemId", itemId
-        );
-        return patch("/" + itemId, id, parameters, itemDto);
+    public ResponseEntity<Object> updateItem(Long itemId, Long id, ItemDto itemDto) {
+        return patch("/" + itemId, id, itemDto);
     }
 
     public ResponseEntity<Object> findItemById(Long id, Long itemId) {
@@ -53,9 +51,6 @@ public class ItemClient extends ItemBaseClient {
     }
 
     public ResponseEntity<Object> findItemByString(String text) {
-        Map<String, Object> parameters = Map.of(
-                "text", text
-        );
         return get("/search?text=" + text, null, null);
     }
 
@@ -63,6 +58,16 @@ public class ItemClient extends ItemBaseClient {
         Map<String, Object> parameters = Map.of(
                 "itemId", itemId
         );
-        return post("/{itemId}/comment", id, parameters, commentDto);
+        return post("/" + itemId + "/comment", id, parameters, commentDto);
+    }
+
+    private void validateItemDto(ItemDto itemDto) {
+        if (itemDto.getIsAvailable() == null) {
+            throw new InvalidParameterException("Item isAvailable is empty");
+        } else if (itemDto.getName() == null || itemDto.getName().equals("")) {
+            throw new InvalidParameterException("Item name is empty");
+        } else if (itemDto.getDescription() == null || itemDto.getDescription().equals("")) {
+            throw new InvalidParameterException("Item description is empty");
+        }
     }
 }

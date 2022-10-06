@@ -3,7 +3,6 @@ package ru.practicum.shareit.user;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.InvalidParameterException;
 import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 
@@ -31,7 +30,6 @@ public class UserServiceImpl implements UserService {
     }
 
     public UserDto createUser(UserDto userDto) {
-        validateEmail(userDto);
         log.info("Created user");
         return UserMapper.toUserDto(userRepository.save(UserMapper.toUser(userDto)));
     }
@@ -76,13 +74,6 @@ public class UserServiceImpl implements UserService {
         if (!userRepository.existsById(id)) {
             log.info("UserNotFoundException: User not found");
             throw new UserNotFoundException("User not found");
-        }
-    }
-
-    private void validateEmail(UserDto userDto) {
-        if (userDto.getEmail() == null || !userDto.getEmail().contains("@")) {
-            log.info("InvalidParameterException: email is null");
-            throw new InvalidParameterException("email is null");
         }
     }
 

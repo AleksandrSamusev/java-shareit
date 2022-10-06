@@ -48,7 +48,6 @@ public class ItemServiceImpl implements ItemService {
     }
 
     public ItemDto createItem(Long id, Long requestId, ItemDto itemDto) {
-        validateItemDto(itemDto);
         itemDto.setOwner(userService.findUserById(id));
         if (requestId != null) {
             validateRequest(requestId);
@@ -209,19 +208,6 @@ public class ItemServiceImpl implements ItemService {
         if (!itemRepository.existsById(itemId)) {
             log.info("ItemNotFoundException: Item not found");
             throw new ItemNotFoundException("Item not found");
-        }
-    }
-
-    private void validateItemDto(ItemDto itemDto) {
-        if (itemDto.getIsAvailable() == null) {
-            log.info("InvalidParameterException: Item isAvailable is empty");
-            throw new InvalidParameterException("Item isAvailable is empty");
-        } else if (itemDto.getName() == null || itemDto.getName().equals("")) {
-            log.info("InvalidParameterException: Item name is empty");
-            throw new InvalidParameterException("Item name is empty");
-        } else if (itemDto.getDescription() == null || itemDto.getDescription().equals("")) {
-            log.info("InvalidParameterException: Item description is empty");
-            throw new InvalidParameterException("Item description is empty");
         }
     }
 
