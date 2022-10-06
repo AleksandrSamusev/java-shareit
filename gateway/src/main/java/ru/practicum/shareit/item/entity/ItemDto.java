@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.booking.BookingDto;
+import ru.practicum.shareit.booking.entity.BookingDto;
 import ru.practicum.shareit.comment.entity.CommentDto;
 import ru.practicum.shareit.user.entity.UserDto;
 

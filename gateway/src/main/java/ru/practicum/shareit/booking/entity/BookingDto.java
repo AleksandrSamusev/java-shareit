@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.item.ItemDto;
-import ru.practicum.shareit.user.UserDto;
+import ru.practicum.shareit.item.entity.ItemDto;
+import ru.practicum.shareit.user.entity.UserDto;
 
 import java.time.LocalDateTime;
 
