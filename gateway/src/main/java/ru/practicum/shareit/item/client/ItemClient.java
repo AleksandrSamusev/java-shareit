@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.client;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -15,6 +16,7 @@ import ru.practicum.shareit.item.entity.ItemDto;
 import java.util.Map;
 
 @Service
+@Slf4j
 public class ItemClient extends BaseClient {
 
     private static final String API_PREFIX = "/items";
@@ -55,6 +57,7 @@ public class ItemClient extends BaseClient {
     }
 
     public ResponseEntity<Object> postComment(Long id, Long itemId, CommentDto commentDto) {
+        validateComment(commentDto);
         Map<String, Object> parameters = Map.of(
                 "itemId", itemId
         );
@@ -68,6 +71,13 @@ public class ItemClient extends BaseClient {
             throw new InvalidParameterException("Item name is empty");
         } else if (itemDto.getDescription() == null || itemDto.getDescription().equals("")) {
             throw new InvalidParameterException("Item description is empty");
+        }
+    }
+
+    private void validateComment(CommentDto commentDto) {
+        if (commentDto.getText().isEmpty() || commentDto.getText().isBlank()) {
+            log.info("InvalidParameterException: Text field is empty");
+            throw new InvalidParameterException("Text field is empty");
         }
     }
 }

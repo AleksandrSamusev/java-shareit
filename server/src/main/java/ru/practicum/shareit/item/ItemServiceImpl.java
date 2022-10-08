@@ -172,7 +172,6 @@ public class ItemServiceImpl implements ItemService {
     }
 
     public CommentDto postComment(Long userId, Long itemId, CommentDto commentDto) {
-        validateComment(commentDto);
         validateUser(userId);
         validateItem(itemId);
 
@@ -208,13 +207,6 @@ public class ItemServiceImpl implements ItemService {
         if (!itemRepository.existsById(itemId)) {
             log.info("ItemNotFoundException: Item not found");
             throw new ItemNotFoundException("Item not found");
-        }
-    }
-
-    private void validateComment(CommentDto commentDto) {
-        if (commentDto.getText().isEmpty() || commentDto.getText().isBlank()) {
-            log.info("InvalidParameterException: Text field is empty");
-            throw new InvalidParameterException("Text field is empty");
         }
     }
 
