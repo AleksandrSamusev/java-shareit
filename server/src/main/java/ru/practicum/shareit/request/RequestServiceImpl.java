@@ -5,7 +5,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.InvalidParameterException;
 import ru.practicum.shareit.exception.RequestNotFoundException;
 import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.item.ItemMapper;
@@ -31,10 +30,8 @@ public class RequestServiceImpl implements RequestService {
         this.itemRepository = itemRepository;
     }
 
-
     public RequestDto createRequest(Long id, RequestDto requestDto) {
-
-        validateCreateRequest(id, requestDto);
+        validateUserId(id);
         Request request = new Request();
         request.setCreated(LocalDateTime.now());
         request.setDescription(requestDto.getDescription());
@@ -68,7 +65,6 @@ public class RequestServiceImpl implements RequestService {
 
     public List<RequestDtoResponse> findAllRequestsWithPagination(Long userId, Integer from, Integer size) {
         validateUserId(userId);
-        validatePaginationParameters(from, size);
         if (from != null && size != null) {
             Pageable pageable = PageRequest.of(from, size, Sort.by("created").descending());
             List<Request> requestsFromDb = requestRepository.findOthersRequestsWithPagination(userId, pageable);
@@ -85,14 +81,6 @@ public class RequestServiceImpl implements RequestService {
         return findAllRequestsWithResponses(userId);
     }
 
-    private void validateCreateRequest(Long id, RequestDto requestDto) {
-        validateUserId(id);
-        if (requestDto.getDescription() == null || requestDto.getDescription().isBlank()
-                || requestDto.getDescription().isEmpty()) {
-            log.info("InvalidParameterException: Description field is empty");
-            throw new InvalidParameterException("Description field is empty");
-        }
-    }
 
     private void validateUserId(Long id) {
         if (id == null || !userRepository.existsById(id)) {
@@ -108,14 +96,4 @@ public class RequestServiceImpl implements RequestService {
         }
     }
 
-    private void validatePaginationParameters(Integer from, Integer size) {
-        if (from != null && from < 0) {
-            log.info("InvalidParameterException: Parameter (from) should be > or = 0");
-            throw new InvalidParameterException("Parameter \"from\" should be > or = 0");
-        }
-        if (size != null && size <= 0) {
-            log.info("InvalidParameterException: Parameter (size) should be > 0");
-            throw new InvalidParameterException("Parameter \"size\" should be > 0");
-        }
-    }
 }

@@ -1,5 +1,6 @@
 package ru.practicum.shareit.request.client;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -8,11 +9,13 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.shareit.client.BaseClient;
+import ru.practicum.shareit.exception.InvalidParameterException;
 import ru.practicum.shareit.request.entity.RequestDto;
 
 import java.util.Map;
 
 @Service
+@Slf4j
 public class RequestClient extends BaseClient {
 
     private static final String API_PREFIX = "/requests";
@@ -28,6 +31,7 @@ public class RequestClient extends BaseClient {
     }
 
     public ResponseEntity<Object> createRequest(Long id, RequestDto requestDto) {
+        validateCreateRequest(requestDto);
         return post("", id, null, requestDto);
     }
 
@@ -43,10 +47,31 @@ public class RequestClient extends BaseClient {
     }
 
     public ResponseEntity<Object> findAllRequestsWithPagination(Long id, Integer from, Integer size) {
+        validatePaginationParameters(from, size);
         Map<String, Object> parameters = Map.of(
                 "from", from,
                 "size", size
         );
         return get("/all?from={from}&size={size}", id, parameters);
+    }
+
+
+    private void validatePaginationParameters(Integer from, Integer size) {
+        if (from != null && from < 0) {
+            log.info("InvalidParameterException: Parameter (from) should be > or = 0");
+            throw new InvalidParameterException("Parameter \"from\" should be > or = 0");
+        }
+        if (size != null && size <= 0) {
+            log.info("InvalidParameterException: Parameter (size) should be > 0");
+            throw new InvalidParameterException("Parameter \"size\" should be > 0");
+        }
+    }
+
+    private void validateCreateRequest(RequestDto requestDto) {
+        if (requestDto.getDescription() == null || requestDto.getDescription().isBlank()
+                || requestDto.getDescription().isEmpty()) {
+            log.info("InvalidParameterException: Description field is empty");
+            throw new InvalidParameterException("Description field is empty");
+        }
     }
 }
