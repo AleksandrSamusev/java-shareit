@@ -6,13 +6,15 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.*;
+import ru.practicum.shareit.exception.BookingNotFoundException;
+import ru.practicum.shareit.exception.InvalidParameterException;
+import ru.practicum.shareit.exception.ItemNotFoundException;
+import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.item.ItemDto;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.user.UserDto;
 import ru.practicum.shareit.user.UserRepository;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -97,9 +99,6 @@ public class BookingServiceImpl implements BookingService {
 
     public List<BookingDto> findBookingByIdAndStatus(String state, Long id, Integer from, Integer size) {
         validateUser(id);
-        validateState(state);
-        validatePagination(from, size);
-
         Pageable pageable = PageRequest.of(from / size, size, Sort.by("start").descending());
         BookingStatus status = BookingStatus.valueOf(state);
         List<Booking> list = new ArrayList<>();
@@ -125,9 +124,6 @@ public class BookingServiceImpl implements BookingService {
 
     public List<BookingDto> findAllOwnersBookings(String state, Long id, Integer from, Integer size) {
         validateUser(id);
-        validateState(state);
-        validatePagination(from, size);
-
         Pageable pageable = PageRequest.of(from / size, size, Sort.by("start").descending());
         List<Booking> list = new ArrayList<>();
         BookingStatus status = BookingStatus.valueOf(state);
@@ -151,15 +147,6 @@ public class BookingServiceImpl implements BookingService {
         return BookingMapper.toBookingDtos(list);
     }
 
-    private void validateState(String state) {
-        if (!state.equals(BookingStatus.ALL.name()) && !state.equals(BookingStatus.REJECTED.name())
-                && !state.equals(BookingStatus.WAITING.name()) && !state.equals(BookingStatus.CURRENT.name())
-                && !state.equals(BookingStatus.APPROVED.name()) && !state.equals(BookingStatus.CANCELED.name())
-                && !state.equals(BookingStatus.PAST.name()) && !state.equals(BookingStatus.FUTURE.name())) {
-            log.info("ValidationException: Unknown state: \"{}\"", state);
-            throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
-        }
-    }
 
     private void validateUser(Long id) {
         if (!userRepository.existsById(id)) {
@@ -185,18 +172,6 @@ public class BookingServiceImpl implements BookingService {
             log.info("ItemNotFoundException: Illegal operation");
             throw new ItemNotFoundException("Illegal operation");
         }
-        if (bookingSmallDto.getEnd().isBefore(LocalDateTime.now())) {
-            log.info("InvalidParameterException: End date in past");
-            throw new InvalidParameterException("End date in past");
-        }
-        if (bookingSmallDto.getEnd().isBefore(bookingSmallDto.getStart())) {
-            log.info("InvalidParameterException: End date before start");
-            throw new InvalidParameterException("End date before start");
-        }
-        if (bookingSmallDto.getStart().isBefore(LocalDateTime.now())) {
-            log.info("InvalidParameterException: Start date in past");
-            throw new InvalidParameterException("Start date in past");
-        }
         if (!userRepository.existsById(id)) {
             log.info("UserNotFoundException: User with ID = {} not found", id);
             throw new UserNotFoundException("User not found");
@@ -209,12 +184,4 @@ public class BookingServiceImpl implements BookingService {
         }
         return true;
     }
-
-    private void validatePagination(Integer from, Integer size) {
-        if (from < 0 || size <= 0) {
-            log.info("InvalidParameterException: Wrong parameter");
-            throw new InvalidParameterException("Wrong parameter");
-        }
-    }
-
 }
