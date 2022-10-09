@@ -36,7 +36,8 @@ public class RequestClient extends BaseClient {
     }
 
     public ResponseEntity<Object> findAllRequestsWithResponses(Long id) {
-        return get("", id, null);
+        return get("", id,
+                null);
     }
 
     public ResponseEntity<Object> findRequestWithResponses(Long userId, Long requestId) {

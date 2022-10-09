@@ -53,7 +53,8 @@ public class ItemClient extends BaseClient {
     }
 
     public ResponseEntity<Object> findItemByString(String text) {
-        return get("/search?text=" + text, null, null);
+        return get("/search?text=" + text,
+                null, null);
     }
 
     public ResponseEntity<Object> postComment(Long id, Long itemId, CommentDto commentDto) {
