@@ -8,7 +8,6 @@ import ru.practicum.shareit.booking.BookingDto;
 import ru.practicum.shareit.comment.CommentDto;
 import ru.practicum.shareit.user.UserDto;
 
-import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,7 +23,6 @@ public class ItemDto {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String description;
 
-    @NotNull
     @JsonProperty(value = "available")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Boolean isAvailable;
